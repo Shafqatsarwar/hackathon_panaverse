@@ -1,3 +1,5 @@
-2026/01/24-00:51:42.475 52ec Reusing MANIFEST D:\Panavers\Projects\hackathon_panaverse\whatsapp_session\Default\Local Storage\leveldb/MANIFEST-000001
-2026/01/24-00:51:42.495 52ec Recovering log #3
-2026/01/24-00:51:42.521 52ec Reusing old log D:\Panavers\Projects\hackathon_panaverse\whatsapp_session\Default\Local Storage\leveldb/000003.log 
+2026/01/24-01:05:10.514 20f4 Reusing MANIFEST D:\Panavers\Projects\hackathon_panaverse\whatsapp_session\Default\Local Storage\leveldb/MANIFEST-000001
+2026/01/24-01:05:10.527 20f4 Recovering log #3
+2026/01/24-01:05:10.527 20f4 Level-0 table #3: started
+2026/01/24-01:05:10.536 20f4 Level-0 table #3: 20048 bytes OK
+2026/01/24-01:05:10.541 20f4 Delete type=0 #3
