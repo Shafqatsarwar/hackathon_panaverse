@@ -1,0 +1,106 @@
+[
+  {
+    "timestamp": "2026-01-24T00:00:05.154035",
+    "task": "email_check",
+    "data": {
+      "status": "completed",
+      "emails_found": 4,
+      "emails": [
+        {
+          "subject": "Is it okay to back out of a job offer if a better one comes along? Vote here.",
+          "priority": "high"
+        },
+        {
+          "subject": "Khan-Shafqat, follow Syed Sair Ali - Chief Executive Officer at Blinkco.io",
+          "priority": "high"
+        },
+        {
+          "subject": "AI is reshaping the workforce. Here's what that means for hiring.",
+          "priority": "high"
+        },
+        {
+          "subject": "Your turn, Khan-Shafqat \ud83c\udfc6",
+          "priority": "high"
+        }
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-01-24T00:23:59.682372",
+    "task": "email_check",
+    "data": {
+      "status": "completed",
+      "emails_found": 4,
+      "emails": [
+        {
+          "subject": "Is it okay to back out of a job offer if a better one comes along? Vote here.",
+          "priority": "high"
+        },
+        {
+          "subject": "Khan-Shafqat, follow Syed Sair Ali - Chief Executive Officer at Blinkco.io",
+          "priority": "high"
+        },
+        {
+          "subject": "AI is reshaping the workforce. Here's what that means for hiring.",
+          "priority": "high"
+        },
+        {
+          "subject": "Your turn, Khan-Shafqat \ud83c\udfc6",
+          "priority": "high"
+        }
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-01-24T00:38:32.499251",
+    "task": "email_check",
+    "data": {
+      "status": "completed",
+      "emails_found": 4,
+      "emails": [
+        {
+          "subject": "Is it okay to back out of a job offer if a better one comes along? Vote here.",
+          "priority": "high"
+        },
+        {
+          "subject": "Khan-Shafqat, follow Syed Sair Ali - Chief Executive Officer at Blinkco.io",
+          "priority": "high"
+        },
+        {
+          "subject": "AI is reshaping the workforce. Here's what that means for hiring.",
+          "priority": "high"
+        },
+        {
+          "subject": "Your turn, Khan-Shafqat \ud83c\udfc6",
+          "priority": "high"
+        }
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-01-24T00:52:07.081637",
+    "task": "email_check",
+    "data": {
+      "status": "completed",
+      "emails_found": 4,
+      "emails": [
+        {
+          "subject": "Is it okay to back out of a job offer if a better one comes along? Vote here.",
+          "priority": "high"
+        },
+        {
+          "subject": "Khan-Shafqat, follow Syed Sair Ali - Chief Executive Officer at Blinkco.io",
+          "priority": "high"
+        },
+        {
+          "subject": "AI is reshaping the workforce. Here's what that means for hiring.",
+          "priority": "high"
+        },
+        {
+          "subject": "Your turn, Khan-Shafqat \ud83c\udfc6",
+          "priority": "high"
+        }
+      ]
+    }
+  }
+]

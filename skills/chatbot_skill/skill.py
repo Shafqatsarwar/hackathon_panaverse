@@ -1,0 +1,106 @@
+"""
+Chatbot Skill (Gemini Integration)
+"""
+import logging
+import time
+import google.generativeai as genai
+from typing import Dict, Any, Generator
+
+logger = logging.getLogger(__name__)
+
+class ChatbotSkill:
+    """Skill for AI generation using Gemini"""
+    
+    def __init__(self, api_key: str, model_name: str = 'gemini-2.0-flash', fallback_models: list = None):
+        if not api_key:
+            logger.warning("ChatbotSkill: No API Key provided")
+            self.model = None
+            self.model_name = None
+        else:
+            genai.configure(api_key=api_key)
+            self.models_to_try = [model_name] + (fallback_models or [])
+            self.current_model_index = 0
+            self._initialize_model()
+
+    def _initialize_model(self):
+        """Initialize the current model"""
+        if self.current_model_index < len(self.models_to_try):
+            model_name = self.models_to_try[self.current_model_index]
+            logger.info(f"ChatbotSkill: Initializing model: {model_name}")
+            self.model = genai.GenerativeModel(model_name=model_name)
+            self.model_name = model_name
+        else:
+            logger.error("ChatbotSkill: All models failed to initialize or valid models exhausted.")
+            self.model = None
+
+    def _switch_to_fallback(self):
+        """Switch to next available fallback model"""
+        self.current_model_index += 1
+        if self.current_model_index < len(self.models_to_try):
+            logger.warning(f"ChatbotSkill: Switching to fallback model: {self.models_to_try[self.current_model_index]}")
+            self._initialize_model()
+            return True
+        return False
+    
+    def start_chat(self, history: list = None):
+        """Start a new chat session"""
+        if not self.model:
+            raise ValueError("Gemini not configured")
+        return self.model.start_chat(history=history or [])
+        
+    def generate_response(self, chat_session, message: str, retries: int = 3) -> str:
+        """Generate a response with retry logic"""
+        if not self.model:
+            return "Error: AI not configured."
+            
+        for attempt in range(retries):
+            try:
+                response = chat_session.send_message(message)
+                return response.text
+            except Exception as e:
+                error_str = str(e)
+                # Check for 404 (Not Found / Invalid Model) or 400 (Bad Request - typically model related if others work)
+                if "404" in error_str or "not found" in error_str.lower() or "400" in error_str:
+                     logger.warning(f"Model {self.model_name} failed with fatal error: {error_str}")
+                     if self._switch_to_fallback():
+                         # We need to restart the chat session with the new model
+                         # Note: History preservation is complex here as 'chat_session' object is tied to model.
+                         # SImple fallback: Start new session (or if caller handles session, this might be tricky).
+                         # For this skill: We rely on the caller to handle session management usually, 
+                         # but since we pass 'chat_session' in, we can't easily swap 'chat_session' IN PLACE.
+                         # Workaround for Phase 6: We inform error, but if we init checks passed...
+                         # Actually for 404, it usually happens on first call.
+                         # Let's try to notify user or handle it. 
+                         # Since this is a simple skill, we'll return error asking for retry which might trigger re-init?
+                         # Better: Re-raise or return specific error?
+                         return f"Error: Model {self.model_name} failed. Switched to fallback. Please retry."
+                
+                if "429" in error_str and attempt < retries - 1:
+                    wait_time = (attempt + 1) * 2
+                    logger.warning(f"Rate limit hit, retrying in {wait_time}s...")
+                    time.sleep(wait_time)
+                else:
+                    return f"Error: {str(e)}"
+        return "Error: Failed after retries"
+        
+    def stream_response(self, chat_session, message: str, retries: int = 3) -> Generator[str, None, None]:
+        """Stream a response with retry logic"""
+        if not self.model:
+            yield "Error: AI not configured."
+            return
+            
+        for attempt in range(retries):
+            try:
+                response = chat_session.send_message(message, stream=True)
+                for chunk in response:
+                    if chunk.text:
+                        yield chunk.text
+                return
+            except Exception as e:
+                if "429" in str(e) and attempt < retries - 1:
+                    wait_time = (attempt + 1) * 2
+                    yield f" [Rate limit hit, retrying in {wait_time}s...] "
+                    time.sleep(wait_time)
+                else:
+                    yield f"Error: {str(e)}"
+                    return

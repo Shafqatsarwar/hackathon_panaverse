@@ -14,6 +14,9 @@
 - `gmail_monitoring`: Gmail API integration for inbox monitoring
 - `email_filtering`: Email categorization, keyword matching, priority detection
 - `email_notifications`: SMTP-based email notification delivery
+- `whatsapp_skill`: WhatsApp messaging and alerts
+- `linkedin_skill`: LinkedIn updates and networking
+- `chatbot_skill`: Generative AI wrapper (Gemini)
 
 ### II. Agent Autonomy & Orchestration
 **Agents compose skills to perform autonomous actions**
@@ -69,7 +72,7 @@
   "skills_required": ["skill1", "skill2"],
   "schedule": "every N minutes | on_demand",
   "success_criteria": { "key": "expected_value" },
-  "error_handling": { "retry_on_failure": true, "max_retries": 3 }
+  "error_handling": { "retry_on_failure": true, "max_retries": 5 }
 }
 ```
 
@@ -81,7 +84,6 @@
 - Logs enable debugging, analytics, and compliance auditing
 - Chat history is queryable and machine-readable
 
-**Log Entry Standard:**
 ```json
 {
   "timestamp": "ISO-8601 format",
@@ -89,7 +91,14 @@
   "agent": "agent_name",
   "action": "action_performed",
   "status": "success | failure | in_progress",
-  "data": { "relevant": "context" }
+  "data": { 
+      "user_id": "user_identifier",
+      "ip_address": "client_ip",
+      "user_agent": "browser_info",
+      "prompt": "full_user_message",
+      "response": "full_ai_response",
+      "relevant": "context" 
+  }
 }
 ```
 
@@ -105,6 +114,8 @@
 - `gmail_server.py`: Gmail API operations (read, search, send)
 - `github_server.py`: GitHub repository and issue management
 - `playwright_server.py`: Web automation and browser interactions
+- `linkedin_server.py`: LinkedIn notifications and network management
+- `whatsapp_server.py`: WhatsApp messaging and notifications
 
 ### VII. Modularity & Reusability
 **Design for composition and extension**
@@ -218,6 +229,18 @@
 - Configuration via environment variables
 - Logging of all MCP tool invocations
 
+### IX. Strict Development Phases
+**All major feature rollouts must follow this 8-phase sequence:**
+
+1. **Foundation & Next.js**: Setup environment, dependencies (uv), and frontend base.
+2. **Gmail Integration**: Ensure email monitoring and notification systems work.
+3. **WhatsApp Integration**: Implement MCP, Skill, and Agent for messaging.
+4. **LinkedIn Integration**: Implement MCP for professional networking.
+5. **GitHub Integration**: specific repository management tasks.
+6. **Chatbot Integration**: Polish the UI/UX and Gemini integration.
+7. **Vercel Deployment**: Cloud configuration and deployment verification.
+8. **PWA & Mobile**: Manifest, service workers, and mobile-responsive updates.
+
 ## Development Workflow
 
 ### Adding a New Skill
@@ -288,7 +311,8 @@
 ## Technology Stack
 
 ### Core Technologies
-- **Language**: Python 3.8+
+- **Language**: Python 3.12+
+- **Dependency Management**: `uv` (pyproject.toml)
 - **Architecture**: Skills → Agents → Tasks
 - **Logging**: JSON-based chat_history
 - **Configuration**: python-dotenv
@@ -299,6 +323,13 @@
 - **SMTP**: Email notifications via email_notifications skill
 - **GitHub API**: Repository management via github_server MCP
 - **Playwright**: Web automation via playwright_server MCP
+- **WhatsApp**: Messaging via whatsapp_server MCP
+- **LinkedIn**: Networking via linkedin_server MCP
+
+### Mobile & PWA
+- **Manifest**: `manifest.json` required
+- **Service Worker**: For offline capabilities
+- **Responsive Design**: Mobile-first CSS
 
 ### Future Integrations (Feature Flags)
 - **WhatsApp**: Enabled via `WHATSAPP_ENABLED=true`

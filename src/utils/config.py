@@ -6,7 +6,7 @@ from typing import List
 from dotenv import load_dotenv
 
 # Load environment variables
-load_dotenv()
+load_dotenv(override=True)
 
 class Config:
     """Application configuration"""
@@ -41,6 +41,12 @@ class Config:
     # GitHub Configuration
     GITHUB_TOKEN = os.getenv("GITHUB_TOKEN", "")
     GITHUB_USERNAME = os.getenv("GITHUB_USERNAME", "")
+
+    # Odoo Configuration
+    ODOO_URL = os.getenv("ODOO_URL", "")
+    ODOO_DB = os.getenv("ODOO_DB", "")
+    ODOO_USERNAME = os.getenv("ODOO_USERNAME", "")
+    ODOO_PASSWORD = os.getenv("ODOO_PASSWORD", "")
     
     # Check Intervals (in minutes)
     EMAIL_CHECK_INTERVAL = int(os.getenv("EMAIL_CHECK_INTERVAL", "15"))

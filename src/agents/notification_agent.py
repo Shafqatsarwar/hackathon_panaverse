@@ -21,7 +21,8 @@ class NotificationAgent:
     
     def send_email_alert(self, admin_email: str, email_data: Dict[str, Any]) -> bool:
         """Send email notification"""
-        logger.info(f"Notification Agent: Sending alert for '{email_data.get('subject')}'")
+        safe_subject = email_data.get('subject', '').encode('ascii', 'ignore').decode('ascii')
+        logger.info(f"Notification Agent: Sending alert for '{safe_subject}'")
         
         success = self.notification_skill.notify_new_email(
             admin_email=admin_email,

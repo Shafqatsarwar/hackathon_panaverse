@@ -12,6 +12,10 @@ from pathlib import Path
 from src.utils.config import Config
 from src.agents.email_agent import EmailAgent
 from src.agents.notification_agent import NotificationAgent
+from src.agents.whatsapp_agent import WhatsAppAgent
+from src.agents.linkedin_agent import LinkedInAgent
+from src.agents.github_agent import GitHubAgent
+from src.agents.odoo_agent import OdooAgent
 
 logging.basicConfig(
     level=logging.INFO,
@@ -30,7 +34,13 @@ class MainAgent:
     def __init__(self):
         self.config = Config
         self.email_agent = None
+        self.email_agent = None
+        self.email_agent_ready = False
         self.notification_agent = None
+        self.whatsapp_agent = None
+        self.linkedin_agent = None
+        self.github_agent = None
+        self.odoo_agent = None
         self.running = False
         self.chat_history_dir = Path("chat_history")
         self.chat_history_dir.mkdir(exist_ok=True)
@@ -56,10 +66,18 @@ class MainAgent:
             filter_keywords=self.config.FILTER_KEYWORDS
         )
         
-        if not self.email_agent.authenticate():
-            raise Exception("Failed to authenticate Email Agent")
         
-        logger.info("Main Agent: Email Agent initialized")
+        try:
+            if self.email_agent.authenticate():
+                self.email_agent_ready = True
+                logger.info("Main Agent: Email Agent initialized and authenticated")
+            else:
+                logger.error("Main Agent: Email authentication failed (Auth flow returned False)")
+        except Exception as e:
+            logger.error(f"Main Agent: Email authentication failed: {e}")
+            logger.info("Main Agent: Continuing without Email Monitoring...")
+        
+        logger.info("Main Agent: Email Agent initialization step complete")
         
         # Initialize Notification Agent
         self.notification_agent = NotificationAgent(
@@ -70,6 +88,35 @@ class MainAgent:
         )
         
         logger.info("Main Agent: Notification Agent initialized")
+        
+        # Initialize WhatsApp Agent
+        if self.config.WHATSAPP_ENABLED:
+            self.whatsapp_agent = WhatsAppAgent()
+            logger.info("Main Agent: WhatsApp Agent initialized")
+        else:
+            logger.info("Main Agent: WhatsApp Agent disabled (skipping initialization)")
+            
+        # Initialize LinkedIn Agent
+        if self.config.LINKEDIN_ENABLED:
+            self.linkedin_agent = LinkedInAgent()
+            logger.info("Main Agent: LinkedIn Agent initialized")
+        else:
+            logger.info("Main Agent: LinkedIn Agent disabled (skipping initialization)")
+
+        # Initialize GitHub Agent (Active if token present)
+        self.github_agent = GitHubAgent()
+        if self.github_agent.enabled:
+             logger.info("Main Agent: GitHub Agent initialized")
+        else:
+             logger.info("Main Agent: GitHub Agent disabled (no token)")
+
+        # Initialize Odoo Agent
+        self.odoo_agent = OdooAgent()
+        if self.odoo_agent.enabled:
+            logger.info("Main Agent: Odoo Agent initialized")
+        else:
+            logger.info("Main Agent: Odoo Agent disabled (missing config)")
+
         logger.info("Main Agent: Initialization complete!")
     
     def check_emails(self):
@@ -78,6 +125,10 @@ class MainAgent:
         logger.info("Main Agent: Running email check task...")
         
         try:
+            if not self.email_agent_ready:
+                # Skip log spam if we know it's down
+                return
+
             # Get relevant emails from Email Agent
             relevant_emails = self.email_agent.check_emails()
             
@@ -93,7 +144,8 @@ class MainAgent:
             
             # Send notifications via Notification Agent
             for email in relevant_emails:
-                logger.info(f"Main Agent: Processing '{email['subject']}'")
+                safe_subject = email['subject'].encode('ascii', 'ignore').decode('ascii')
+                logger.info(f"Main Agent: Processing '{safe_subject}'")
                 
                 success = self.notification_agent.send_email_alert(
                     admin_email=self.config.ADMIN_EMAIL,
@@ -101,10 +153,27 @@ class MainAgent:
                 )
                 
                 if success:
-                    logger.info(f"✓ Notification sent for: {email['subject']}")
+                    logger.info(f"[OK] Notification sent for: {email['subject']}")
                 else:
-                    logger.error(f"✗ Failed to send notification for: {email['subject']}")
-            
+                    logger.error(f"[FAIL] Failed to send notification for: {email['subject']}")
+                
+                # Send WhatsApp Alert
+                if self.whatsapp_agent:
+                    wa_message = f"📧 New Important Email: {email['subject']}\nFrom: {email.get('sender', 'Unknown')}"
+                    wa_result = self.whatsapp_agent.send_alert(wa_message)
+                    if wa_result.get("success"):
+                        logger.info(f"[OK] WhatsApp alert sent for: {email['subject']}")
+                    else:
+                        logger.error(f"[FAIL] Failed to send WhatsApp alert: {wa_result.get('error')}")
+                
+                # Create Odoo Lead
+                if self.odoo_agent and self.odoo_agent.enabled:
+                    odoo_result = self.odoo_agent.create_lead_from_email(email)
+                    if odoo_result.get("success"):
+                        logger.info(f"[OK] Created Odoo Lead ID: {odoo_result.get('id')}")
+                    else:
+                        logger.error(f"[FAIL] Failed to create Odoo Lead: {odoo_result.get('error')}")
+
             # Log to chat history
             self._log_to_chat_history("email_check", {
                 "status": "completed",
@@ -196,5 +265,37 @@ class MainAgent:
         if self.notification_agent:
             notif_status = self.notification_agent.get_status()
             logger.info(f"Notification Agent: {notif_status}")
+            
+        if self.whatsapp_agent:
+            wa_status = self.whatsapp_agent.get_status()
+            logger.info(f"WhatsApp Agent: {wa_status}")
+            
+        if self.linkedin_agent:
+            li_status = self.linkedin_agent.get_status()
+            logger.info(f"LinkedIn Agent: {li_status}")
+            
+        if self.github_agent:
+            gh_status = self.github_agent.get_status()
+            logger.info(f"GitHub Agent: {gh_status}")
         
         logger.info("=" * 50)
+    
+    def get_status(self):
+        """Get status as dictionary for API consumption"""
+        return {
+            "agent": "MainAgent",
+            "running": self.running,
+            "email_agent": self.email_agent.get_status() if self.email_agent_ready else "auth_failed",
+            "notification_agent": self.notification_agent.get_status() if self.notification_agent else "not_initialized",
+            "whatsapp_agent": self.whatsapp_agent.get_status() if self.whatsapp_agent else "disabled",
+            "linkedin_agent": self.linkedin_agent.get_status() if self.linkedin_agent else "disabled",
+            "github_agent": self.github_agent.get_status() if self.github_agent else "disabled",
+            "odoo_agent": self.odoo_agent.get_status() if self.odoo_agent else "disabled",
+            "config": {
+                "email_check_interval": self.config.EMAIL_CHECK_INTERVAL,
+                "filter_keywords": self.config.FILTER_KEYWORDS,
+                "whatsapp_enabled": self.config.WHATSAPP_ENABLED,
+                "linkedin_enabled": self.config.LINKEDIN_ENABLED
+            }
+        }
+

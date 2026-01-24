@@ -2,7 +2,7 @@
 FastAPI Chat API - Web interface for Panversity Student Assistant
 Serves the modern chatbot UI and handles chat requests
 """
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -73,7 +73,7 @@ async def serve_ui():
 
 
 @app.post("/api/chat", response_model=ChatResponse)
-async def chat(message: ChatMessage):
+async def chat(message: ChatMessage, request: Request):
     """
     Handle chat message and return AI response
     
@@ -86,6 +86,10 @@ async def chat(message: ChatMessage):
     try:
         result = chat_agent.chat(message.message, message.user_id)
         
+        # Capture metadata
+        client_ip = request.client.host if request.client else "unknown"
+        user_agent = request.headers.get("user-agent", "unknown")
+        
         # Log to chat history
         await log_to_chat_history({
             "timestamp": result["timestamp"],
@@ -95,7 +99,9 @@ async def chat(message: ChatMessage):
             "status": result["status"],
             "data": {
                 "user_id": message.user_id,
-                "message": message.message,
+                "ip_address": client_ip,
+                "user_agent": user_agent,
+                "prompt": message.message,
                 "response": result["response"],
                 "tokens_used": result.get("tokens_used", 0)
             }
@@ -150,7 +156,10 @@ async def websocket_chat(websocket: WebSocket):
                 "timestamp": datetime.now().isoformat()
             })
             
-            # Log to chat history
+            # Log to chat history (stream complete)
+            client_ip = websocket.client.host if websocket.client else "unknown"
+            user_agent = websocket.headers.get("user-agent", "unknown")
+
             await log_to_chat_history({
                 "timestamp": datetime.now().isoformat(),
                 "task": "chat_stream",
@@ -159,7 +168,9 @@ async def websocket_chat(websocket: WebSocket):
                 "status": "success",
                 "data": {
                     "user_id": user_id,
-                    "message": user_message,
+                    "ip_address": client_ip,
+                    "user_agent": user_agent,
+                    "prompt": user_message,
                     "response": full_response
                 }
             })

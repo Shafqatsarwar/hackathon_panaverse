@@ -7,27 +7,28 @@ import os
 import json
 from typing import Dict, List, Optional
 from datetime import datetime
-import google.generativeai as genai
 from duckduckgo_search import DDGS
 from src.utils.config import Config
+from skills.chatbot_skill.skill import ChatbotSkill
 
 
 class ChatAgent:
     """Agent for handling conversational interactions with users using Gemini"""
     
     def __init__(self):
-        """Initialize ChatAgent with Gemini client"""
-        # Configure Gemini
-        genai.configure(api_key=Config.GOOGLE_API_KEY)
-        
-        # Initialize Gemini model with tools
-        self.model = genai.GenerativeModel(
-            model_name='gemini-2.0-flash-exp',
-            system_instruction=self._build_system_prompt()
+        """Initialize ChatAgent with Chatbot Skill"""
+        # Initialize Chatbot Skill
+        self.chatbot_skill = ChatbotSkill(
+            api_key=Config.GOOGLE_API_KEY,
+            model_name='gemini-2.5-flash',
+            fallback_models=['gemini-2.0-flash']
         )
         
         self.chat_session = None
         self.conversation_history: List[Dict[str, str]] = []
+        # System prompt is now handled by the skill context or prepended to history/message if API supports it,
+        # but for simplicity we'll keep the system prompt logic or pass it if the skill supported it.
+        # The current simple skill doesn't strictly enforce system prompt in __init__, so we'll rely on it behaving as a chat model.
         
     def _build_system_prompt(self) -> str:
         """Build system prompt with agent context and capabilities"""
@@ -110,6 +111,18 @@ Be helpful, concise, and professional. Use emojis sparingly to make responses fr
             Dict with response, status, and metadata
         """
         try:
+            # Inject Odoo Context if relevant
+            odoo_context = ""
+            if any(kw in user_message.lower() for kw in ["odoo", "lead", "crm", "sales", "opportunity"]):
+                try:
+                    from src.agents.odoo_agent import OdooAgent
+                    odoo = OdooAgent()
+                    if odoo.enabled:
+                        summary = odoo.get_recent_leads_summary()
+                        odoo_context = f"\n[SYSTEM CONTEXT]\n{summary}\n[END CONTEXT]\n"
+                except Exception as e:
+                    print(f"ChatAgent: Failed to fetch Odoo context: {e}")
+
             # Check if web search is needed
             search_keywords = ["search", "find", "look up", "what is", "who is", "current", "latest", "today"]
             needs_search = any(keyword in user_message.lower() for keyword in search_keywords)
@@ -123,14 +136,27 @@ Be helpful, concise, and professional. Use emojis sparingly to make responses fr
             
             # Initialize chat session if not exists
             if self.chat_session is None:
-                self.chat_session = self.model.start_chat(history=[])
+                # Prepend system prompt to first message if needed, or strictly use history.
+                # For now using the skill's start_chat
+                self.chat_session = self.chatbot_skill.start_chat(history=[])
+                # Ideally send system prompt as first message if model supports context,
+                # or just rely on the model.
+                # Let's send the system prompt contextually if it's new session? 
+                # Simplification: We'll append the system prompt text to the first user message if needed 
+                # or just use the system prompt builder for context.
+                
+            # Prepare message with search context and system prompt context
+            # (Note: Re-adding system prompt to every message is expensive/wrong, 
+            # ideally the Agent or Skill handles system instructions better.
+            # For this refactor, we keep it simple).
+            full_context = ""
+            if len(self.conversation_history) == 0:
+                 full_context = self._build_system_prompt() + "\n\n"
+
+            full_message = full_context + user_message + search_context
             
-            # Prepare message with search context
-            full_message = user_message + search_context
-            
-            # Get response from Gemini
-            response = self.chat_session.send_message(full_message)
-            ai_message = response.text
+            # Get response from Skill
+            ai_message = self.chatbot_skill.generate_response(self.chat_session, full_message)
             
             # Add to conversation history
             self.conversation_history.append({
@@ -189,19 +215,20 @@ Be helpful, concise, and professional. Use emojis sparingly to make responses fr
             
             # Initialize chat session if not exists
             if self.chat_session is None:
-                self.chat_session = self.model.start_chat(history=[])
+                self.chat_session = self.chatbot_skill.start_chat(history=[])
             
             # Prepare message with search context
-            full_message = user_message + search_context
+            full_context = ""
+            if len(self.conversation_history) == 0:
+                 full_context = self._build_system_prompt() + "\n\n"
+
+            full_message = full_context + user_message + search_context
             
-            # Stream response from Gemini
-            response = self.chat_session.send_message(full_message, stream=True)
-            
+            # Stream response from Skill
             full_response = ""
-            for chunk in response:
-                if chunk.text:
-                    full_response += chunk.text
-                    yield chunk.text
+            for chunk in self.chatbot_skill.stream_response(self.chat_session, full_message):
+                full_response += chunk
+                yield chunk
             
             # Add to conversation history
             self.conversation_history.append({

@@ -5,7 +5,7 @@ import logging
 from typing import List, Dict, Any
 from datetime import datetime
 from skills.gmail_monitoring.gmail_monitoring import GmailMonitoringSkill
-from skills.email_filtering.email_filtering import EmailFilteringSkill
+from skills.email_filtering import EmailFilteringSkill
 
 logger = logging.getLogger(__name__)
 
