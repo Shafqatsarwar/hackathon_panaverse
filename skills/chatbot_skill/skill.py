@@ -84,11 +84,18 @@ class ChatbotSkill:
                          return f"Error: Model {self.model_name} failed. Switched to fallback. Please retry."
                 
                 if "429" in error_str and attempt < retries - 1:
-                    wait_time = (attempt + 1) * 2
-                    logger.warning(f"Rate limit hit, retrying in {wait_time}s...")
+                    # Attempt to extract suggested wait time from error message
+                    import re
+                    wait_time = (attempt + 1) * 5 # Base wait
+                    match = re.search(r"retry in (\d+\.?\d*)s", error_str)
+                    if match:
+                        wait_time = float(match.group(1)) + 1
+                    
+                    logger.warning(f"Rate limit hit, retrying in {wait_time}s... (Attempt {attempt+1}/{retries})")
                     time.sleep(wait_time)
                 else:
-                    return f"Error: {str(e)}"
+                    logger.error(f"Generate Response Error: {error_str}")
+                    return f"Error: {error_str}"
         return "Error: Failed after retries"
         
     def stream_response(self, chat_session, message: str, retries: int = 3) -> Generator[str, None, None]:
@@ -115,11 +122,17 @@ class ChatbotSkill:
                 return
             except Exception as e:
                 if "429" in str(e) and attempt < retries - 1:
-                    wait_time = (attempt + 1) * 2
-                    yield f" [Rate limit hit, retrying in {wait_time}s...] "
+                    import re
+                    wait_time = (attempt + 1) * 5
+                    match = re.search(r"retry in (\d+\.?\d*)s", str(e))
+                    if match:
+                        wait_time = float(match.group(1)) + 1
+                        
+                    yield f" [Rate limit hit, retrying in {int(wait_time)}s...] "
                     time.sleep(wait_time)
                 else:
                     error_msg = str(e) or type(e).__name__
-                    logger.error(f"ChatbotSkill Error: {error_msg}")
+                    logger.error(f"ChatbotSkill Stream Error: {error_msg}")
                     yield f"Error: {error_msg}"
                     return
+        yield "Error: Failed after retries"

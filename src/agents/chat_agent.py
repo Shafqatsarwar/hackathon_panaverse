@@ -20,7 +20,7 @@ class ChatAgent:
         self.chatbot_skill = ChatbotSkill(
             api_key=Config.GOOGLE_API_KEY,
             model_name='gemini-2.5-flash',
-            fallback_models=['gemini-2.0-flash']
+            fallback_models=['gemini-2.0-flash-thinking-exp', 'gemini-1.5-pro']
         )
         
         # Initialize Skills
@@ -332,7 +332,7 @@ Be helpful, concise, and professional. Use emojis sparingly to make responses fr
             "status": "active",
             "conversation_length": len(self.conversation_history),
             "gemini_configured": bool(Config.GOOGLE_API_KEY),
-            "model": "gemini-2.0-flash-exp",
+            "model": "gemini-2.5-flash",
             "skills_available": [
                 "gmail_monitoring",
                 "email_filtering", 
