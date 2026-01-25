@@ -16,3 +16,4 @@ pytest>=7.4.0
 python-multipart>=0.0.6
 duckduckgo-search>=6.0.0
 websockets>=12.0
+nest-asyncio>=1.6.0

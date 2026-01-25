@@ -114,87 +114,83 @@ When users ask about:
 
 Be helpful, concise, and professional. Use emojis sparingly to make responses friendly."""
     
-    def _check_email_tool(self, query: str = None):
+    def _check_email_tool(self, query: str = "") -> str:
         """
-        Check for important emails.
+        Check for new important emails in the user's inbox.
         
         Args:
-            query: Optional query to filter logic (unused for now, checks all new)
+            query: Reason for checking or specific topic to look for.
         """
         try:
             if not self.email_agent.authenticate():
-                 return "Error: specific functionality not available (Authentication Failed)."
+                  return "Error: Email authentication failed. Please check your credentials."
             
             emails = self.email_agent.check_emails()
             if not emails:
-                return "No new important emails found."
+                return "No new important emails found matching your filter criteria."
             
-            summary = "Found the following emails:\n"
+            summary = f"I found {len(emails)} relevant emails:\n"
             for email in emails:
                 summary += f"- {email.get('subject', 'No Subject')} (Priority: {email.get('priority', 'Unknown')})\n"
             return summary
         except Exception as e:
-            return f"Error checking emails: {e}"
+            logger.error(f"Email tool error: {e}")
+            return f"Failed to check emails: {str(e) or 'Unknown error'}"
 
-    def get_email_tool_definition(self):
-        return {
-            "function_declarations": [
-                {
-                    "name": "_check_email_tool",
-                    "description": "Check for new important emails in the user's inbox.",
-                    "parameters": {
-                        "type": "object",
-                        "properties": {
-                            "query": {"type": "string", "description": "Reason for checking (optional)"}
-                        }
-                    }
-                }
-            ]
-        }
-    
-    def _create_lead_tool(self, name: str, description: str, email: str = "unknown@example.com"):
-        """Create a new lead in Odoo CRM."""
-        if not self.odoo_agent.enabled: return "Odoo is disabled."
+    def _create_lead_tool(self, name: str, description: str, email: str = "unknown@example.com") -> str:
+        """Create a new lead or opportunity in Odoo CRM."""
+        if not self.odoo_agent.enabled: return "Odoo integration is currently disabled."
         res = self.odoo_agent.create_lead(name, email, description)
-        if res.get("success"): return f"Lead created! ID: {res.get('id')}"
-        return f"Failed to create lead: {res.get('error')}"
+        if res.get("success"): return f"Lead successfully created! Odoo ID: {res.get('id')}"
+        return f"Failed to create lead in Odoo: {res.get('error', 'Unknown error')}"
 
-    def _check_whatsapp_tool(self):
-        """Check for unread WhatsApp messages."""
-        if not self.whatsapp_agent: return "WhatsApp Agent not initialized"
+    def _check_whatsapp_tool(self) -> str:
+        """Check for unread WhatsApp messages matching interest keywords (e.g. Panaversity, PIAIC)."""
+        if not self.whatsapp_agent: return "WhatsApp Agent is not initialized."
         
-        msgs = self.whatsapp_agent.get_unread_messages()
-        if not msgs: return "No new unread messages found matching your keywords."
-        
-        if isinstance(msgs[0], dict) and msgs[0].get("error"):
-            return f"WhatsApp Error: {msgs[0].get('error')}"
+        try:
+            msgs = self.whatsapp_agent.get_unread_messages()
+            if not msgs: return "No new unread messages found matching your Panaversity/PIAIC keywords."
             
-        summary = "Found unread WhatsApp messages:\n"
-        for msg in msgs:
-            summary += f"- {msg.get('sender', 'Unknown')}: {msg.get('content', '')[:100]}...\n"
-        return summary
+            if isinstance(msgs[0], dict) and msgs[0].get("error"):
+                return f"WhatsApp check failed: {msgs[0].get('error')}"
+                
+            summary = "Found unread WhatsApp messages:\n"
+            for msg in msgs:
+                summary += f"- {msg.get('sender', 'Unknown')}: {msg.get('content', '')[:100]}\n"
+            return summary
+        except Exception as e:
+            logger.error(f"WhatsApp tool error: {e}")
+            return f"Error accessing WhatsApp: {str(e) or type(e).__name__}"
 
-    def _check_linkedin_tool(self):
-        """Check for LinkedIn notifications."""
-        if not self.linkedin_agent: return "LinkedIn Agent not active"
+    def _check_linkedin_tool(self) -> str:
+        """Check for latest LinkedIn notifications and connection requests."""
+        if not self.linkedin_agent: return "LinkedIn Agent is not active."
         
-        res = self.linkedin_agent.check_notifications()
-        if not res.get("success"):
-            return f"LinkedIn Check Failed: {res.get('error', 'Unknown Error')}"
+        try:
+            res = self.linkedin_agent.check_notifications()
+            if not res.get("success"):
+                return f"LinkedIn Check Failed: {res.get('error', 'Unknown error during browser access')}"
+                
+            notifs = res.get("notifications", [])
+            if not notifs: return "No new LinkedIn notifications found."
             
-        notifs = res.get("notifications", [])
-        if not notifs: return "No new LinkedIn notifications found."
-        
-        summary = "Recent LinkedIn Notifications:\n"
-        for n in notifs:
-            summary += f"- {n[:100]}...\n"
-        return summary
+            summary = "Latest LinkedIn Notifications:\n"
+            for n in notifs:
+                summary += f"- {str(n)[:100]}\n"
+            return summary
+        except Exception as e:
+            logger.error(f"LinkedIn tool error: {e}")
+            return f"Error accessing LinkedIn: {str(e) or type(e).__name__}"
 
-
-    def _get_leads_tool(self, limit: int = 5):
-        """Get recent leads from Odoo CRM."""
-        if not self.odoo_agent.enabled: return "Odoo is disabled."
-        return str(self.odoo_agent.get_recent_leads(limit))
+    def _get_leads_tool(self, limit: int = 5) -> str:
+        """Get a list of the most recent leads from Odoo CRM."""
+        if not self.odoo_agent.enabled: return "Odoo integration is disabled."
+        try:
+            leads = self.odoo_agent.get_recent_leads(limit)
+            return f"Recent Odoo Leads: {str(leads)}"
+        except Exception as e:
+            return f"Error fetching leads: {e}"
     
     def chat(self, user_message: str, user_id: str = "default") -> Dict[str, any]:
         """

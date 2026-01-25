@@ -4,6 +4,12 @@
 > Powered by Google Gemini 2.5, Odoo ERP, and Next.js 14.
 
 ---
+### Run backend:
+python -m uvicorn src.api.chat_api:app --reload --host 0.0.0.0 --port 8000
+
+###Run frontend:
+cd frontend
+npm run dev
 
 ## 📚 Table of Contents
 1. [Project Overview](#1-project-overview)

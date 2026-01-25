@@ -4,6 +4,7 @@ Chatbot Skill (Gemini Integration)
 import logging
 import time
 import google.generativeai as genai
+import nest_asyncio
 from typing import Dict, Any, Generator
 
 logger = logging.getLogger(__name__)
@@ -118,5 +119,7 @@ class ChatbotSkill:
                     yield f" [Rate limit hit, retrying in {wait_time}s...] "
                     time.sleep(wait_time)
                 else:
-                    yield f"Error: {str(e)}"
+                    error_msg = str(e) or type(e).__name__
+                    logger.error(f"ChatbotSkill Error: {error_msg}")
+                    yield f"Error: {error_msg}"
                     return

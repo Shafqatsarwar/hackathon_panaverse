@@ -76,17 +76,46 @@ class LinkedInSkill:
         return {"success": True, "message": "Posting not fully automated yet for safety."}
         
     def _run_async(self, coro):
-        """Helper to run async code safely"""
+        """Helper to run async code safely, especially on Windows with Playwright"""
+        import sys
+        
         try:
             loop = asyncio.get_running_loop()
+            is_running = True
         except RuntimeError:
             loop = None
-            
-        if loop and loop.is_running():
+            is_running = False
+
+        if sys.platform == 'win32':
+            needs_new_loop = False
+            if is_running:
+                # Type name check is robust across different asyncio versions/implementations
+                if type(loop).__name__ == 'SelectorEventLoop':
+                    needs_new_loop = True
+
+            if needs_new_loop:
+                logger.info("LinkedIn Skill: Running in separate thread to support ProactorEventLoop")
+                from concurrent.futures import ThreadPoolExecutor
+                
+                def _threaded_run(c):
+                    # Set up a new Proactor loop for this thread
+                    new_loop = asyncio.WindowsProactorEventLoop()
+                    asyncio.set_event_loop(new_loop)
+                    try:
+                        return new_loop.run_until_complete(c)
+                    finally:
+                        new_loop.close()
+                
+                with ThreadPoolExecutor(max_workers=1) as executor:
+                    return executor.submit(_threaded_run, coro).result()
+
+        if is_running:
             import nest_asyncio
-            nest_asyncio.apply()
-            return asyncio.run(coro)
+            nest_asyncio.apply(loop)
+            return loop.run_until_complete(coro)
         else:
+            if sys.platform == 'win32':
+                asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
             return asyncio.run(coro)
 
     def check_notifications(self) -> Dict[str, Any]:
@@ -100,4 +129,4 @@ class LinkedInSkill:
              return {"success": True, "notifications": results}
         except Exception as e:
              logger.error(f"LinkedIn Async Error: {e}")
-             return {"success": False, "error": str(e)}
+             return {"success": False, "error": f"LinkedIn execution failed: {str(e) or type(e).__name__}"}

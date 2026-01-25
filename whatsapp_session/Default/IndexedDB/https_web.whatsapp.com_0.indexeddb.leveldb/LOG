@@ -1,39 +1,12 @@
-2026/01/25-01:30:35.298 830 Reusing MANIFEST D:\Panavers\Projects\hackathon_panaverse\whatsapp_session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
-2026/01/25-01:30:35.313 830 Recovering log #269
-2026/01/25-01:30:35.399 830 Reusing old log D:\Panavers\Projects\hackathon_panaverse\whatsapp_session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/000269.log 
-2026/01/25-01:30:38.009 830 Compacting 1@0 + 5@1 files
-2026/01/25-01:30:38.315 830 Generated table #272@0: 225210 keys, 2406747 bytes
-2026/01/25-01:30:38.453 830 Generated table #273@0: 68517 keys, 2228155 bytes
-2026/01/25-01:30:38.583 830 Generated table #274@0: 27134 keys, 2184466 bytes
-2026/01/25-01:30:38.676 830 Generated table #275@0: 35046 keys, 1183959 bytes
-2026/01/25-01:30:38.677 830 Compacted 1@0 + 5@1 files => 8003327 bytes
-2026/01/25-01:30:38.678 830 compacted to: files[ 0 4 1 0 0 0 0 ]
-2026/01/25-01:30:38.679 830 Delete type=2 #262
-2026/01/25-01:30:38.680 830 Delete type=2 #265
-2026/01/25-01:30:38.680 830 Delete type=2 #266
-2026/01/25-01:30:38.680 830 Delete type=2 #267
-2026/01/25-01:30:38.680 830 Delete type=2 #268
-2026/01/25-01:30:38.680 830 Delete type=2 #270
-2026/01/25-01:30:41.087 3b0c Level-0 table #277: started
-2026/01/25-01:30:41.117 3b0c Level-0 table #277: 838374 bytes OK
-2026/01/25-01:30:41.118 3b0c Delete type=0 #269
-2026/01/25-01:30:41.119 3b0c Manual compaction at level-0 from '\x00B\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00C\x00\x00\x00' @ 0 : 0; will stop at '\x00B\x00\x00\x05' @ 937308 : 1
-2026/01/25-01:30:41.119 3b0c Compacting 1@0 + 4@1 files
-2026/01/25-01:30:41.400 3b0c Generated table #278@0: 259173 keys, 2449861 bytes
-2026/01/25-01:30:41.496 3b0c Generated table #279@0: 46605 keys, 2205049 bytes
-2026/01/25-01:30:41.573 3b0c Generated table #280@0: 25216 keys, 2187268 bytes
-2026/01/25-01:30:41.604 3b0c Generated table #281@0: 23156 keys, 478977 bytes
-2026/01/25-01:30:41.605 3b0c Compacted 1@0 + 4@1 files => 7321155 bytes
-2026/01/25-01:30:41.605 3b0c compacted to: files[ 0 4 1 0 0 0 0 ]
-2026/01/25-01:30:41.606 3b0c Delete type=2 #277
-2026/01/25-01:30:41.606 3b0c Manual compaction at level-0 from '\x00B\x00\x00\x05' @ 937308 : 1 .. '\x00C\x00\x00\x00' @ 0 : 0; will stop at (end)
-2026/01/25-01:30:48.368 3b0c Compacting 1@1 + 1@2 files
-2026/01/25-01:30:48.499 3b0c Generated table #282@1: 10506 keys, 433130 bytes
-2026/01/25-01:30:48.499 3b0c Compacted 1@1 + 1@2 files => 433130 bytes
-2026/01/25-01:30:48.500 3b0c compacted to: files[ 0 3 1 0 0 0 0 ]
-2026/01/25-01:30:48.500 3b0c Delete type=2 #272
-2026/01/25-01:30:48.501 3b0c Delete type=2 #273
-2026/01/25-01:30:48.501 3b0c Delete type=2 #274
-2026/01/25-01:30:48.501 3b0c Delete type=2 #275
-2026/01/25-01:30:48.514 830 Level-0 table #284: started
-2026/01/25-01:30:48.548 830 Level-0 table #284: 1054615 bytes OK
+2026/01/25-04:51:22.278 4680 Reusing MANIFEST D:\Panavers\Projects\hackathon_panaverse\whatsapp_session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
+2026/01/25-04:51:22.279 4680 Recovering log #442
+2026/01/25-04:51:22.354 4680 Reusing old log D:\Panavers\Projects\hackathon_panaverse\whatsapp_session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/000442.log 
+2026/01/25-04:51:24.167 4760 Level-0 table #448: started
+2026/01/25-04:51:24.193 4760 Level-0 table #448: 614761 bytes OK
+2026/01/25-04:51:24.194 4760 Delete type=0 #442
+2026/01/25-04:51:24.194 4760 Manual compaction at level-0 from '\x00g\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00h\x00\x00\x00' @ 0 : 0; will stop at (end)
+2026/01/25-04:51:24.300 4680 Compacting 1@1 + 2@2 files
+2026/01/25-04:51:24.425 4680 Generated table #449@1: 45131 keys, 2202331 bytes
+2026/01/25-04:51:24.500 4680 Generated table #450@1: 27776 keys, 2141713 bytes
+2026/01/25-04:51:24.500 4680 Compacted 1@1 + 2@2 files => 4344044 bytes
+2026/01/25-04:51:24.501 4680 compacted to: files[ 0 0 2 0 0 0 0 ]

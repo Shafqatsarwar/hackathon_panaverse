@@ -14,20 +14,12 @@ class WebSearchSkill:
         self.ddgs = DDGS()
         
     def search(self, query: str, max_results: int = 5) -> List[Dict[str, str]]:
-        """
-        Perform a web search.
-        
-        Args:
-            query: The search query.
-            max_results: Number of results to return.
-            
-        Returns:
-            List of dictionaries containing 'title', 'href', and 'body'.
-        """
+        """Perform a web search."""
         try:
             logger.info(f"WebSearchSkill: Searching for '{query}'")
-            results = list(self.ddgs.text(query, max_results=max_results))
-            return results
+            with DDGS() as ddgs:
+                results = list(ddgs.text(query, max_results=max_results))
+                return results
         except Exception as e:
             logger.error(f"WebSearchSkill: Search failed: {e}")
             return []

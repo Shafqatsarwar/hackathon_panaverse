@@ -39,11 +39,10 @@ async def verify_login():
             
             await page.goto("https://web.whatsapp.com")
             
-            print("Waiting for login (checking for side pane)...")
             try:
-                # Wait up to 2 minutes for user to scan
-                await page.wait_for_selector("#pane-side", timeout=120000)
-                print("SUCCESS: WhatsApp is logged in!")
+                # Wait up to 10s for session to be recognized
+                await page.wait_for_selector("#pane-side", timeout=10000)
+                print("SUCCESS: WhatsApp session is ACTIVE!")
             except Exception:
                 print("TIMEOUT: Login failed or QR code not scanned.")
             

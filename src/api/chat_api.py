@@ -11,6 +11,22 @@ from typing import List, Dict
 import json
 from datetime import datetime
 from pathlib import Path
+import asyncio
+import os
+import nest_asyncio
+import logging
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
+# Global initialization for Windows and Nested Loops
+if os.name == 'nt':
+    asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
+nest_asyncio.apply()
 
 from src.agents.chat_agent import ChatAgent
 from src.agents.main_agent import MainAgent
@@ -39,6 +55,19 @@ app.mount("/static", StaticFiles(directory=str(public_dir)), name="static")
 # Initialize agents
 chat_agent = ChatAgent()
 main_agent = MainAgent()
+
+@app.on_event("startup")
+async def startup_event():
+    """Initialize agents on startup"""
+    try:
+        # Initialize main_agent in background or sync if needed
+        # We'll do it sync but it might delay startup slightly. 
+        # Better: run in thread if it blocks too much.
+        loop = asyncio.get_running_loop()
+        loop.run_in_executor(None, main_agent.initialize)
+        logger.info("API: Main Agent initialization started in background")
+    except Exception as e:
+        logger.error(f"API: Failed to start agent initialization: {e}")
 
 
 class ChatMessage(BaseModel):
@@ -221,7 +250,7 @@ async def log_to_chat_history(entry: Dict):
     try:
         # Use MainAgent's logging method
         main_agent._log_to_chat_history(
-            task=entry["task"],
+            task_name=entry["task"],
             data=entry["data"]
         )
     except Exception as e:

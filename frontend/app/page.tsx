@@ -142,8 +142,8 @@ export default function Home() {
                 I can check your emails, update Odoo leads, or answer course questions.
               </p>
             </div>
-            <div className="flex gap-4">
-              {['Check my unread emails', 'Update Odoo tasks', 'Any new leads?'].map((suggestion) => (
+            <div className="flex gap-4 flex-wrap justify-center">
+              {['Check my unread emails', 'Update Odoo tasks', 'check my whatapp about any panaverse update'].map((suggestion) => (
                 <button
                   key={suggestion}
                   onClick={() => setInput(suggestion)}
@@ -163,8 +163,8 @@ export default function Home() {
           >
             <div
               className={`max-w-[70%] rounded-3xl px-8 py-6 text-lg shadow-xl backdrop-blur-md ${msg.role === "user"
-                  ? "bg-gradient-to-br from-blue-600 to-purple-700 text-white rounded-br-none border border-white/10"
-                  : "bg-zinc-800/80 text-gray-100 rounded-bl-none border border-white/10"
+                ? "bg-gradient-to-br from-blue-600 to-purple-700 text-white rounded-br-none border border-white/10"
+                : "bg-zinc-800/80 text-gray-100 rounded-bl-none border border-white/10"
                 }`}
             >
               <div className="whitespace-pre-wrap leading-relaxed">
