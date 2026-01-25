@@ -60,4 +60,12 @@ htmlcov/
 .claude/
 
 # Old project files
+# Old project files
 public/2nd_hackathon-phase1-3/
+
+# Browser Sessions (Playwright)
+whatsapp_session/
+linkedin_session/
+
+# Chat History Logs
+History/chat_history/

@@ -1,34 +1,40 @@
 @echo off
-REM Panaversity Student Assistant - Windows Startup Script
+cd /d "%~dp0"
+title Panaversity Assistant Launcher
+color 0b
 
-echo ================================================
-echo Panaversity Student Assistant
-echo ================================================
+echo ========================================================
+echo      Panaversity Student Assistant - Auto Launcher
+echo ========================================================
 echo.
 
-REM Check if .env exists
-if not exist .env (
-    echo ERROR: .env file not found!
-    echo Please copy .env.example to .env and configure it.
-    echo.
-    pause
-    exit /b 1
+echo [INFO] Starting Panaversity Assistant...
+
+:: Install Frontend Deps if missing (Simple check)
+if not exist "frontend\node_modules" (
+    echo [SETUP] Installing Frontend Dependencies...
+    cd frontend
+    call npm install
+    cd ..
 )
 
-REM Check if credentials.json exists
-if not exist credentials.json (
-    echo WARNING: credentials.json not found!
-    echo Please download it from Google Cloud Console.
-    echo See SETUP.md for instructions.
-    echo.
-    pause
-    exit /b 1
-)
+echo [1/2] Launching Backend Server (New Window)...
+start "Backend API (Port 8000)" cmd /k "python -m uvicorn src.api.chat_api:app --reload --host 0.0.0.0 --port 8000"
 
-echo Starting Panaversity Student Assistant...
+echo [WAIT] Waiting for backend to initialize...
+timeout /t 5 >nul
+
+echo [2/2] Launching Frontend Interface (New Window)...
+cd frontend
+start "Next.js Frontend (Port 3000)" cmd /k "npm run dev"
+
 echo.
-
-REM Run the assistant
-python src/main.py start
-
+echo ========================================================
+echo [SUCCESS] System is running!
+echo.
+echo  - Frontend: http://localhost:3000
+echo  - Backend:  http://localhost:8000
+echo.
+echo You can close this window now.
+echo ========================================================
 pause

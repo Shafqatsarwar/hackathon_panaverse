@@ -20,14 +20,20 @@ class ChatbotSkill:
             genai.configure(api_key=api_key)
             self.models_to_try = [model_name] + (fallback_models or [])
             self.current_model_index = 0
+            self.tools = None
             self._initialize_model()
+
+    def set_tools(self, tools: list):
+        """Set tools for function calling"""
+        self.tools = tools
+        self._initialize_model()  # Re-init model with tools
 
     def _initialize_model(self):
         """Initialize the current model"""
         if self.current_model_index < len(self.models_to_try):
             model_name = self.models_to_try[self.current_model_index]
-            logger.info(f"ChatbotSkill: Initializing model: {model_name}")
-            self.model = genai.GenerativeModel(model_name=model_name)
+            logger.info(f"ChatbotSkill: Initializing model: {model_name} with tools: {bool(self.tools)}")
+            self.model = genai.GenerativeModel(model_name=model_name, tools=self.tools)
             self.model_name = model_name
         else:
             logger.error("ChatbotSkill: All models failed to initialize or valid models exhausted.")
@@ -46,7 +52,8 @@ class ChatbotSkill:
         """Start a new chat session"""
         if not self.model:
             raise ValueError("Gemini not configured")
-        return self.model.start_chat(history=history or [])
+        # Ensure automatic function calling is enabled if tools present
+        return self.model.start_chat(history=history or [], enable_automatic_function_calling=True if self.tools else False)
         
     def generate_response(self, chat_session, message: str, retries: int = 3) -> str:
         """Generate a response with retry logic"""
@@ -91,10 +98,19 @@ class ChatbotSkill:
             
         for attempt in range(retries):
             try:
-                response = chat_session.send_message(message, stream=True)
-                for chunk in response:
-                    if chunk.text:
-                        yield chunk.text
+                # Disable streaming if tools are present to avoid SDK error
+                do_stream = True if not self.tools else False
+                
+                response = chat_session.send_message(message, stream=do_stream)
+                
+                if do_stream:
+                    for chunk in response:
+                        if chunk.text:
+                            yield chunk.text
+                else:
+                    # If not streaming, yield the full text at once
+                    if response.text:
+                        yield response.text
                 return
             except Exception as e:
                 if "429" in str(e) and attempt < retries - 1:

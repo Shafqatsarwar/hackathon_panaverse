@@ -42,8 +42,8 @@ class MainAgent:
         self.github_agent = None
         self.odoo_agent = None
         self.running = False
-        self.chat_history_dir = Path("chat_history")
-        self.chat_history_dir.mkdir(exist_ok=True)
+        self.chat_history_dir = Path("History/chat_history")
+        self.chat_history_dir.mkdir(parents=True, exist_ok=True)
         
         # Validate configuration
         errors = self.config.validate()

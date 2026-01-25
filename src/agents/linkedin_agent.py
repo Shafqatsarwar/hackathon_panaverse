@@ -19,7 +19,11 @@ class LinkedInAgent:
         return self.skill.post_update(message)
     
     def check_notifications(self) -> Dict[str, Any]:
-        """Check for notifications"""
+        """
+        Check for notifications.
+        Returns:
+             Dict containing 'notifications' (List[str]) and 'success' (bool)
+        """
         return self.skill.check_notifications()
         
     def get_status(self) -> Dict[str, Any]:

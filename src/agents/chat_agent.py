@@ -16,13 +16,48 @@ class ChatAgent:
     """Agent for handling conversational interactions with users using Gemini"""
     
     def __init__(self):
-        """Initialize ChatAgent with Chatbot Skill"""
         # Initialize Chatbot Skill
         self.chatbot_skill = ChatbotSkill(
             api_key=Config.GOOGLE_API_KEY,
             model_name='gemini-2.5-flash',
             fallback_models=['gemini-2.0-flash']
         )
+        
+        # Initialize Skills
+        from skills.web_search_skill.skill import WebSearchSkill
+        from src.agents.email_agent import EmailAgent
+        from src.agents.odoo_agent import OdooAgent
+        from src.agents.odoo_agent import OdooAgent
+        from src.agents.whatsapp_agent import WhatsAppAgent
+        from src.agents.linkedin_agent import LinkedInAgent
+        
+        self.web_search_skill = WebSearchSkill()
+        
+        # Initialize Agents (for tool use)
+        self.email_agent = EmailAgent(
+            credentials_path=Config.GMAIL_CREDENTIALS_PATH,
+            token_path=Config.GMAIL_TOKEN_PATH,
+            filter_keywords=Config.FILTER_KEYWORDS
+        )
+        
+        self.odoo_agent = OdooAgent()
+        self.whatsapp_agent = WhatsAppAgent()
+        self.linkedin_agent = LinkedInAgent()
+        
+        # Define Tools
+        self.tools = [
+            self.web_search_skill.search, 
+            self._check_email_tool,
+            self._create_lead_tool,
+            self._get_leads_tool,
+            self._check_whatsapp_tool,
+            self._check_linkedin_tool
+        ]
+        self.chatbot_skill.set_tools(self.tools)
+        
+        # Tools were overwritten here previously - causing the bug!
+        # Keeping all tools active: WebSearch, Email, Odoo, WhatsApp, LinkedIn
+        self.chatbot_skill.set_tools(self.tools)
         
         self.chat_session = None
         self.conversation_history: List[Dict[str, str]] = []
@@ -32,26 +67,35 @@ class ChatAgent:
         
     def _build_system_prompt(self) -> str:
         """Build system prompt with agent context and capabilities"""
-        return f"""You are the Panversity Student Assistant, an AI-powered helper for students.
+        return f"""You are the Panversity Student Assistant, an AI-powered helper for students and staff.
 
-Your capabilities and skills:
+Your capabilities and skills (available via tools):
 
-1. **Email Monitoring** (gmail_monitoring skill):
-   - Monitor Gmail inbox for important emails
-   - Filter emails by keywords: {', '.join(Config.FILTER_KEYWORDS)}
-   - Detect priority levels and deadlines
-   
-2. **Email Filtering** (email_filtering skill):
-   - Categorize emails by type (quiz, assignment, exam, general)
-   - Detect priority (High/Medium/Low)
-   - Identify deadlines and due dates
-   
-3. **Email Notifications** (email_notifications skill):
-   - Send email alerts to: {Config.ADMIN_EMAIL}
-   - Format notifications with priority badges
-   - Deliver important updates via SMTP
+1. **Email Management**:
+   - Check inbox for important emails (Quiz, Assignment, etc.)
+   - Tool: `_check_email_tool`
 
-4. **Web Search**:
+2. **Web Search**:
+   - Search the web for current events, facts, or general knowledge.
+   - Tool: `web_search`
+
+3. **Odoo CRM**:
+   - Create new leads/opportunities from chat interactions.
+   - Retrieve recent leads to provide updates.
+   - Tools: `_create_lead_tool`, `_get_leads_tool`
+
+3. **Email Notifications**:
+   - System automatically notifies admin of high-priority emails.
+
+4. **WhatsApp**:
+   - Check unread messages (filtered by keywords like Panaversity, PIAIC, etc.)
+   - Tool: `_check_whatsapp_tool`
+
+5. **LinkedIn**:
+   - Check for new notifications (connection requests, alerts).
+   - Tool: `_check_linkedin_tool`
+
+6. **Web Search**:
    - Search the web for current information
    - Answer questions about topics not in your training data
    - Provide up-to-date information
@@ -70,34 +114,87 @@ When users ask about:
 
 Be helpful, concise, and professional. Use emojis sparingly to make responses friendly."""
     
-    def _web_search(self, query: str, max_results: int = 3) -> str:
+    def _check_email_tool(self, query: str = None):
         """
-        Perform web search using DuckDuckGo
+        Check for important emails.
         
         Args:
-            query: Search query
-            max_results: Maximum number of results to return
-            
-        Returns:
-            Formatted search results as string
+            query: Optional query to filter logic (unused for now, checks all new)
         """
         try:
-            with DDGS() as ddgs:
-                results = list(ddgs.text(query, max_results=max_results))
-                
-            if not results:
-                return "No search results found."
+            if not self.email_agent.authenticate():
+                 return "Error: specific functionality not available (Authentication Failed)."
             
-            formatted_results = f"Web search results for '{query}':\n\n"
-            for i, result in enumerate(results, 1):
-                formatted_results += f"{i}. **{result['title']}**\n"
-                formatted_results += f"   {result['body']}\n"
-                formatted_results += f"   Source: {result['href']}\n\n"
+            emails = self.email_agent.check_emails()
+            if not emails:
+                return "No new important emails found."
             
-            return formatted_results
-            
+            summary = "Found the following emails:\n"
+            for email in emails:
+                summary += f"- {email.get('subject', 'No Subject')} (Priority: {email.get('priority', 'Unknown')})\n"
+            return summary
         except Exception as e:
-            return f"Web search error: {str(e)}"
+            return f"Error checking emails: {e}"
+
+    def get_email_tool_definition(self):
+        return {
+            "function_declarations": [
+                {
+                    "name": "_check_email_tool",
+                    "description": "Check for new important emails in the user's inbox.",
+                    "parameters": {
+                        "type": "object",
+                        "properties": {
+                            "query": {"type": "string", "description": "Reason for checking (optional)"}
+                        }
+                    }
+                }
+            ]
+        }
+    
+    def _create_lead_tool(self, name: str, description: str, email: str = "unknown@example.com"):
+        """Create a new lead in Odoo CRM."""
+        if not self.odoo_agent.enabled: return "Odoo is disabled."
+        res = self.odoo_agent.create_lead(name, email, description)
+        if res.get("success"): return f"Lead created! ID: {res.get('id')}"
+        return f"Failed to create lead: {res.get('error')}"
+
+    def _check_whatsapp_tool(self):
+        """Check for unread WhatsApp messages."""
+        if not self.whatsapp_agent: return "WhatsApp Agent not initialized"
+        
+        msgs = self.whatsapp_agent.get_unread_messages()
+        if not msgs: return "No new unread messages found matching your keywords."
+        
+        if isinstance(msgs[0], dict) and msgs[0].get("error"):
+            return f"WhatsApp Error: {msgs[0].get('error')}"
+            
+        summary = "Found unread WhatsApp messages:\n"
+        for msg in msgs:
+            summary += f"- {msg.get('sender', 'Unknown')}: {msg.get('content', '')[:100]}...\n"
+        return summary
+
+    def _check_linkedin_tool(self):
+        """Check for LinkedIn notifications."""
+        if not self.linkedin_agent: return "LinkedIn Agent not active"
+        
+        res = self.linkedin_agent.check_notifications()
+        if not res.get("success"):
+            return f"LinkedIn Check Failed: {res.get('error', 'Unknown Error')}"
+            
+        notifs = res.get("notifications", [])
+        if not notifs: return "No new LinkedIn notifications found."
+        
+        summary = "Recent LinkedIn Notifications:\n"
+        for n in notifs:
+            summary += f"- {n[:100]}...\n"
+        return summary
+
+
+    def _get_leads_tool(self, limit: int = 5):
+        """Get recent leads from Odoo CRM."""
+        if not self.odoo_agent.enabled: return "Odoo is disabled."
+        return str(self.odoo_agent.get_recent_leads(limit))
     
     def chat(self, user_message: str, user_id: str = "default") -> Dict[str, any]:
         """
@@ -123,39 +220,19 @@ Be helpful, concise, and professional. Use emojis sparingly to make responses fr
                 except Exception as e:
                     print(f"ChatAgent: Failed to fetch Odoo context: {e}")
 
-            # Check if web search is needed
-            search_keywords = ["search", "find", "look up", "what is", "who is", "current", "latest", "today"]
-            needs_search = any(keyword in user_message.lower() for keyword in search_keywords)
-            
-            # Perform web search if needed
-            search_context = ""
-            if needs_search:
-                # Extract search query (simple heuristic)
-                search_query = user_message
-                search_context = f"\n\n[Web Search Results]\n{self._web_search(search_query)}"
-            
             # Initialize chat session if not exists
             if self.chat_session is None:
-                # Prepend system prompt to first message if needed, or strictly use history.
-                # For now using the skill's start_chat
                 self.chat_session = self.chatbot_skill.start_chat(history=[])
-                # Ideally send system prompt as first message if model supports context,
-                # or just rely on the model.
-                # Let's send the system prompt contextually if it's new session? 
-                # Simplification: We'll append the system prompt text to the first user message if needed 
-                # or just use the system prompt builder for context.
                 
-            # Prepare message with search context and system prompt context
-            # (Note: Re-adding system prompt to every message is expensive/wrong, 
-            # ideally the Agent or Skill handles system instructions better.
-            # For this refactor, we keep it simple).
+            # Prepare message with context
+            # We rely on the model to call tools (Web Search) if needed.
             full_context = ""
             if len(self.conversation_history) == 0:
                  full_context = self._build_system_prompt() + "\n\n"
 
-            full_message = full_context + user_message + search_context
+            full_message = full_context + user_message
             
-            # Get response from Skill
+            # Get response from Skill (Gemini handles function calling automatically via SDK)
             ai_message = self.chatbot_skill.generate_response(self.chat_session, full_message)
             
             # Add to conversation history
@@ -175,7 +252,7 @@ Be helpful, concise, and professional. Use emojis sparingly to make responses fr
                 "response": ai_message,
                 "timestamp": datetime.now().isoformat(),
                 "user_id": user_id,
-                "web_search_used": needs_search
+                "web_search_used": False # Handled internally by model now
             }
             
         except Exception as e:
@@ -200,30 +277,27 @@ Be helpful, concise, and professional. Use emojis sparingly to make responses fr
             Chunks of the AI response
         """
         try:
-            # Check if web search is needed
-            search_keywords = ["search", "find", "look up", "what is", "who is", "current", "latest", "today"]
-            needs_search = any(keyword in user_message.lower() for keyword in search_keywords)
-            
-            # Perform web search if needed
-            search_context = ""
-            if needs_search:
-                search_query = user_message
-                search_results = self._web_search(search_query)
-                search_context = f"\n\n[Web Search Results]\n{search_results}"
-                # Yield search indicator
-                yield f"🔍 *Searching the web...*\n\n"
-            
             # Initialize chat session if not exists
             if self.chat_session is None:
                 self.chat_session = self.chatbot_skill.start_chat(history=[])
             
-            # Prepare message with search context
+            # Prepare message
             full_context = ""
             if len(self.conversation_history) == 0:
                  full_context = self._build_system_prompt() + "\n\n"
 
-            full_message = full_context + user_message + search_context
+            full_message = full_context + user_message
+            # yield f"🔍 *Thinking... (I can search the web if needed)*\n\n"
             
+            # Prepare message
+            full_context = ""
+            if len(self.conversation_history) == 0:
+                 full_context = self._build_system_prompt() + "\n\n"
+            
+            # Note: Streaming with tools is complex in some SDKs. 
+            # If function call happens, it might not stream until function resolves.
+            # For now, we assume standard stream.
+
             # Stream response from Skill
             full_response = ""
             for chunk in self.chatbot_skill.stream_response(self.chat_session, full_message):

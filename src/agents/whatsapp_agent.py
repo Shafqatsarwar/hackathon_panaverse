@@ -19,6 +19,14 @@ class WhatsAppAgent:
         admin_number = Config.ADMIN_WHATSAPP
         return self.skill.send_message(admin_number, message)
         
+    def get_unread_messages(self, limit: int = 5) -> list:
+        """Get unread messages, optionally filtered by config keywords"""
+        # User requested specific keywords: Panaversity, PIAIC, etc.
+        # We'll use the ones from Config + explicit ones if needed, 
+        # but for now rely on Config which user implied they updated/we should use.
+        keywords = Config.FILTER_KEYWORDS
+        return self.skill.check_unread_messages(keywords=keywords, limit=limit)
+
     def get_status(self) -> Dict[str, Any]:
         return {
             "name": "WhatsAppAgent",

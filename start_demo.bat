@@ -1,4 +1,5 @@
 @echo off
+cd /d "%~dp0"
 echo Starting Panaversity Student Assistant - Full Stack Demo...
 
 :: 1. Start Backend API (FastAPI) in a new window
@@ -11,6 +12,10 @@ timeout /t 5
 :: 3. Start Frontend (Next.js) in a new window
 echo Launching Frontend...
 cd frontend
+if not exist "node_modules" (
+    echo Installing dependencies (first run only)...
+    call npm install
+)
 start "Frontend (Port 3000)" cmd /k "npm run dev"
 
 echo.
