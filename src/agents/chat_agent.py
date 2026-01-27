@@ -7,7 +7,7 @@ import os
 import json
 from typing import Dict, List, Optional
 from datetime import datetime
-from duckduckgo_search import DDGS
+# from duckduckgo_search import DDGS (Disabled)
 from src.utils.config import Config
 from skills.chatbot_skill.skill import ChatbotSkill
 
@@ -100,6 +100,10 @@ Your capabilities and skills (available via tools):
    - Answer questions about topics not in your training data
    - Provide up-to-date information
 
+7. **General Capabilities**:
+   - You are a large language model capable of general reasoning, coding, creative writing (songs, poems), and answering general knowledge questions.
+   - You should NOT limit yourself only to Panaversity tasks. If a user asks for a song, code, or general help, you SHOULD provide it.
+
 Current configuration:
 - Email monitoring: Active (checks every {Config.EMAIL_CHECK_INTERVAL} minutes)
 - Admin contact: {Config.ADMIN_EMAIL}
@@ -111,6 +115,7 @@ When users ask about:
 - Tasks/Deadlines: Help them organize and prioritize
 - Panversity/PIAIC: Provide information and guidance
 - Current events/facts: Use web search to get accurate information
+- **Creative/General Requests**: Fulfill them to the best of your ability (e.g. write songs, debug code, explain concepts).
 
 Be helpful, concise, and professional. Use emojis sparingly to make responses friendly."""
     

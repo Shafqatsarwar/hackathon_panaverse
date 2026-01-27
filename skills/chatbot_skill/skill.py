@@ -4,7 +4,7 @@ Chatbot Skill (Gemini Integration)
 import logging
 import time
 import google.generativeai as genai
-import nest_asyncio
+# import nest_asyncio
 from typing import Dict, Any, Generator
 
 logger = logging.getLogger(__name__)
@@ -113,7 +113,7 @@ class ChatbotSkill:
                 
                 if do_stream:
                     for chunk in response:
-                        if chunk.text:
+                        if hasattr(chunk, 'text') and chunk.text:
                             yield chunk.text
                 else:
                     # If not streaming, yield the full text at once

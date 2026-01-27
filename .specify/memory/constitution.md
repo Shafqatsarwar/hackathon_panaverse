@@ -1,374 +1,298 @@
-# Panversity Student Assistant Constitution
+# 🧠 Panaversity Student Assistant - Constitution v2.0
+## Personal Digital FTE (Autonomous AI Employee)
+*The definitive rulebook for the Panaversity Agentic AI System*
 
-## Core Principles
+---
 
-### I. Skills-First Architecture
-**Every capability starts as a reusable skill**
-- Skills are self-contained, independently testable modules
-- Each skill has a single, well-defined responsibility
-- Skills must include `SKILL.md` documentation with usage examples
-- Skills have no dependencies on agents or tasks
-- Skills expose clear interfaces for agent consumption
+## 1. Agent Identity & Mission
 
-**Current Skills:**
-- `gmail_monitoring`: Gmail API integration for inbox monitoring
-- `email_filtering`: Email categorization, keyword matching, priority detection
-- `email_notifications`: SMTP-based email notification delivery
-- `whatsapp_skill`: WhatsApp messaging and alerts
-- `linkedin_skill`: LinkedIn updates and networking
-- `chatbot_skill`: Generative AI wrapper (Gemini)
+**Name:** Panaversity Assistant  
+**Type:** Personal AI Employee (Digital Full-Time Equivalent)  
+**Operating Model:** Local-first, agent-driven, human-in-the-loop  
+**Availability:** 24/7 via Watchers + MCP Servers + API
+**Authority:** Human owner (`Khan Sarwar`) is the FINAL decision-maker.
 
-### II. Agent Autonomy & Orchestration
-**Agents compose skills to perform autonomous actions**
-- Agents use one or more skills to accomplish specific goals
-- Each agent maintains its own state and provides status reporting
-- Agents handle errors gracefully with retry logic and fallback mechanisms
-- Agents must implement `get_status()` for observability
-- Agents are coordinated by higher-level orchestrator agents
+### Core Mission
+The Panaversity Assistant exists to **autonomously** manage, monitor, and act upon all academic and business communications. It must:
+1. **Detect** relevant signals from all monitored channels.
+2. **Reason** over them using AI (Gemini).
+3. **Propose/Execute** actions via skills.
+4. **Notify** the human of all important events.
+5. **Log** everything for complete auditability.
+6. **Request Approval** for high-stakes actions (HITL).
 
-**Current Agents:**
-- `EmailAgent`: Monitors Gmail using gmail_monitoring + email_filtering skills
-- `NotificationAgent`: Sends alerts using email_notifications skill
-- `MainAgent`: Orchestrates EmailAgent + NotificationAgent for complete workflows
-- `ChatAgent`: Conversational AI using Google Gemini for user interactions
+### Relevance Domains (Mandatory Keywords)
+The agent MUST monitor for and react to topics containing:
+- **Organizations:** Panaversity, PIAIC, Panaverse
+- **Cohorts:** Batch 47, Lahore, UMT
+- **Academics:** Quiz, Assignment, Exam, Deadline, Classroom, Announcement
+- **Business:** Leads, Ads, Viewers, Opportunities, CRM
 
-### III. Chatbot Assistant (User Interface)
-**A helpful chatbot interface for all autonomous tasks**
-- ChatAgent provides natural language interface to all system capabilities
-- Users can query email status, task progress, and system information via chat
-- Chatbot uses Google Gemini AI for intelligent, context-aware responses
-- Web search integration for answering questions beyond training data
-- Real-time streaming responses for better user experience
-- Chat history maintained for context and auditability
+---
 
-**Chatbot Capabilities:**
-- **Email Management**: "Check my emails", "Any important messages?", "Show quiz deadlines"
-- **Task Assistance**: "What tasks are running?", "When is the next email check?"
-- **Information Queries**: "What is Panversity?", "Search for Python tutorials"
-- **System Status**: "Show agent status", "Is email monitoring active?"
-- **Skill Integration**: Access to all skills through conversational interface
+## 2. Architecture: The Platinum Tier (Non-Negotiable)
 
-**Technical Implementation:**
-- Google AI SDK (@google/generative-ai) for Gemini integration
-- Next.js 15 + React frontend for modern UI/UX
-- WebSocket/streaming for real-time responses
-- DuckDuckGo integration for web search
-- Glassmorphism design for premium user experience
+The system operates on a decoupled **Watcher -> Vault -> Brain** model for maximum robustness.
 
-### IV. Task-Driven Execution
-**Tasks define what needs to be done and coordinate agents**
-- Tasks are declarative JSON definitions in `tasks/` directory
-- Each task specifies: name, agents, skills_required, schedule, success_criteria
-- Tasks define clear success criteria and error handling policies
-- Tasks can be scheduled (cron-like) or triggered on-demand
-- Task execution is logged to chat history for auditability
+### 2.1 The Vault (Local-First Memory)
+The `data/vault/` directory is the **single source of truth**. All state is stored as Markdown or JSON files.
 
-**Task Definition Standard:**
-```json
-{
-  "name": "task_name",
-  "description": "Clear description of task purpose",
-  "agents": ["Agent1", "Agent2"],
-  "skills_required": ["skill1", "skill2"],
-  "schedule": "every N minutes | on_demand",
-  "success_criteria": { "key": "expected_value" },
-  "error_handling": { "retry_on_failure": true, "max_retries": 5 }
-}
+**Required Structure:**
 ```
+data/vault/
+├── Inbox/            # Raw incoming event data
+├── Needs_Action/     # Tasks awaiting processing by the Brain
+├── Plans/            # Agent-generated plans for actions
+├── Pending_Approval/ # Actions awaiting human HITL approval
+├── Approved/         # Human-approved actions ready for execution
+├── Done/             # Archive of completed tasks
+└── Logs/             # Structured JSON logs (YYYY-MM-DD.json)
+```
+**Rule: Secrets are NEVER stored in the Vault.**
 
-### V. Observability & Audit Trail (NON-NEGOTIABLE)
-**Complete chat history logging is mandatory**
-- All agent activities are logged to `chat_history/` as daily JSON files
-- Log format: `chat_history/YYYY-MM-DD.json`
-- Each log entry includes: timestamp, task, agent, action, status, data
-- Logs enable debugging, analytics, and compliance auditing
-- Chat history is queryable and machine-readable
+### 2.2 The Watchers (`watchers.py`)
+"The Senses" of the AI. These run continuously.
+- **Role:** Monitor external inputs (Gmail, WhatsApp, LinkedIn, Odoo, GitHub).
+- **Action:** When a relevant event occurs, create a standardized `.md` file in `/Needs_Action`.
+- **Key Principle:** Zero logic overlap with the Brain. Watchers only *observe* and *create tasks*.
 
+### 2.3 The Brain (`brain_agent.py`)
+"The Muscle" of the AI. It processes the Vault.
+- **Role:** Watch `/Needs_Action` for new files.
+- **Action:** Read task, determine skill, execute via `MainAgent`, move file to `/Done`.
+- **The Ralph Wiggum Persistence Loop:** The agent MUST persist until task completion. Retry autonomously. Do not exit until the task reaches `/Done`. Lazy or partial task completion is **FORBIDDEN**.
+
+### 2.4 The API & Frontend
+- **Backend:** FastAPI (`src/api/chat_api.py`) at `http://localhost:8000`.
+- **Frontend:** Next.js (`frontend/`) at `http://localhost:3000`.
+- **WebSockets:** Real-time streaming for chat.
+
+---
+
+## 3. The Skills Layer (Foundation)
+
+**Every capability starts as a reusable, testable skill.**
+
+**Location:** `skills/skill_name/`
+
+### Skills Manifest
+| Skill Name | Purpose | Status |
+|------------|---------|--------|
+| `chatbot_skill` | Gemini AI Wrapper (LLM) | ✅ Active |
+| `gmail_monitoring` | Gmail API for inbox monitoring | ✅ Active |
+| `email_filtering` | Keyword matching & priority detection | ✅ Active |
+| `email_notifications` | SMTP for sending alerts | ✅ Active |
+| `whatsapp_skill` | WhatsApp Web automation (Playwright) | ✅ Active |
+| `linkedin_skill` | LinkedIn automation (Playwright) | ✅ Active |
+| `odoo_skill` | Odoo CRM via XML-RPC | ✅ Active |
+| `web_search_skill` | DuckDuckGo search (currently mocked) | ⚠️ Partial |
+
+### Skill Standards
+- `SKILL.md`: Required documentation.
+- Single Responsibility.
+- No dependencies on agents or tasks.
+- Must be independently testable.
+- Type hints for all public methods.
+
+---
+
+## 4. The Agents Layer (Orchestration)
+
+**Agents compose skills to perform autonomous actions.**
+
+**Location:** `src/agents/`
+
+### Agents Manifest
+| Agent Name | Responsibility | Skills Used |
+|------------|----------------|-------------|
+| `MainAgent` | Master orchestrator, task execution | All |
+| `ChatAgent` | Conversational UI, tool calling | chatbot_skill, all others via tools |
+| `EmailAgent` | Email monitoring loop | gmail_monitoring, email_filtering |
+| `NotificationAgent` | Sending alerts | email_notifications |
+| `OdooAgent` | CRM lead management | odoo_skill |
+| `WhatsAppAgent` | WhatsApp reading/sending | whatsapp_skill |
+| `LinkedInAgent` | LinkedIn notifications | linkedin_skill |
+
+### Required Sub-Agents (Per Hackathon Spec)
+- **Communication Agent:** Email, WhatsApp, LinkedIn
+- **Academic Agent:** Quizzes, Assignments, Announcements
+- **Lead Agent:** Ads, Viewers, CRM capture
+- **Operations Agent:** Retries, recovery, logs
+- **Approval Agent:** Human-in-the-loop enforcement
+
+### Agent Standards
+- Must implement `get_status() -> Dict`.
+- Must import skills (never duplicate skill logic).
+- Must log all significant actions.
+- Must handle errors gracefully with retries.
+
+---
+
+## 5. MCP Server Integration (Mandatory)
+
+**All external actions MUST be performed using Model Context Protocol (MCP) servers.**
+
+**Location:** `src/mcp_servers/`
+
+### Required MCP Integrations
+| MCP Server | Purpose |
+|------------|---------|
+| `gmail_server.py` | Read, search, send emails |
+| `whatsapp_server.py` | Message reading, alerts |
+| `linkedin_server.py` | Lead capture, notifications |
+| `odoo_server.py` | CRM, accounting, leads |
+| `github_server.py` | Repo activity awareness |
+| `playwright_server.py` | Browser automation |
+
+**Rule: Direct API calls without MCP are NOT allowed for production features.**
+
+---
+
+## 6. Human-in-the-Loop (HITL) - Non-Negotiable
+
+The agent MUST request approval before:
+1. Sending emails to **new** contacts.
+2. Sending WhatsApp replies with **commitments**.
+3. Posting ads or public announcements.
+4. Creating invoices or modifying CRM records with financial impact.
+5. Executing any **irreversible** action.
+
+### Approval Mechanism
+1. Agent creates a file in `/Pending_Approval`.
+2. Human reviews and moves the file to `/Approved`.
+3. Agent executes the approved action.
+
+---
+
+## 7. Notifications Policy
+
+For every high-priority relevant event, notify the admin on **both channels**:
+
+- **Email:** `khansarwar1@hotmail.com`
+- **WhatsApp:** `+923244279017`
+
+Each notification must include:
+- Source (e.g., "Gmail", "LinkedIn")
+- Short summary of the event
+- Urgency level (High / Medium / Low)
+- Suggested next action
+
+---
+
+## 8. Logging & Accountability (Non-Negotiable)
+
+### Chat History Logging
+**Location:** `chat_history/YYYY-MM-DD.json`
+
+Every action must be logged with:
 ```json
 {
   "timestamp": "ISO-8601 format",
   "task": "task_name",
   "agent": "agent_name",
   "action": "action_performed",
-  "status": "success | failure | in_progress",
-  "data": { 
-      "user_id": "user_identifier",
-      "ip_address": "client_ip",
-      "user_agent": "browser_info",
-      "prompt": "full_user_message",
-      "response": "full_ai_response",
-      "relevant": "context" 
-  }
+  "status": "success | failure | pending_approval",
+  "approval_status": "approved | pending | not_required",
+  "data": { "prompt": "...", "response": "...", "context": "..." }
 }
 ```
 
-### VI. MCP Server Integration
-**Model Context Protocol servers extend agent capabilities**
-- MCP servers provide standardized interfaces for external services
-- Each MCP server exposes tools, resources, and prompts
-- MCP servers are located in `src/mcp_servers/`
-- Agents can leverage MCP tools for enhanced functionality
-- MCP servers follow the official MCP specification
+**Minimum Retention:** 90 days.
 
-**Current MCP Servers:**
-- `gmail_server.py`: Gmail API operations (read, search, send)
-- `github_server.py`: GitHub repository and issue management
-- `playwright_server.py`: Web automation and browser interactions
-- `linkedin_server.py`: LinkedIn notifications and network management
-- `whatsapp_server.py`: WhatsApp messaging and notifications
+---
 
-### VII. Modularity & Reusability
-**Design for composition and extension**
-- Skills can be used by multiple agents
-- Agents can be composed into higher-level workflows
-- Tasks can be combined and scheduled independently
-- Clear separation of concerns: Skills → Agents → Tasks → Chat History
-- New capabilities added through new skills/agents, not modifications
+## 9. Security & Privacy
 
-### VIII. Configuration-Driven Behavior
-**Environment-based configuration without code changes**
-- All credentials and secrets in `.env` (never committed)
-- Configuration loaded via `src/utils/config.py`
-- Feature flags for enabling/disabling capabilities (WHATSAPP_ENABLED, LINKEDIN_ENABLED)
-- Configurable intervals, keywords, and thresholds
-- Validation of required configuration on startup
+- **Credentials:** Via `.env` only. Never committed to Git.
+- **WhatsApp Session:** Never synced to cloud.
+- **Cloud Agents:** Operate in **draft-only** mode.
+- **Final Actions:** Require **local** human approval.
 
-## Architecture Standards
+---
 
-### Skills Layer Standards
-**Location:** `skills/skill_name/`
+## 10. Cloud & Runtime Policy
 
-**Required Files:**
-- `SKILL.md`: Documentation with purpose, usage, examples
-- `skill_name.py`: Implementation with clear public interface
+**Oracle Cloud Free Tier** is the preferred cloud runtime for 24/7 operation.
 
-**Implementation Requirements:**
-- Single responsibility principle
-- No dependencies on agents or tasks
-- Independent testability
-- Error handling with descriptive exceptions
-- Type hints for all public methods
+| Responsibility | Location |
+|----------------|----------|
+| Watchers, Draft Generation, Lead Capture | ☁️ Cloud |
+| Approvals, WhatsApp Sessions, Final Send/Post | 💻 Local |
 
-**Documentation Requirements:**
-- Purpose and use cases
-- Installation/setup instructions
-- Code examples
-- API reference
-- Known limitations
+---
 
-### Agents Layer Standards
-**Location:** `src/agents/agent_name.py`
+## 11. Dependency & Compatibility
 
-**Required Methods:**
-- `__init__()`: Initialize with required skills/dependencies
-- `get_status()`: Return current agent status and metrics
-- Core action methods specific to agent purpose
+### Python
+- **Version:** `3.12 – 3.13`
+- **Key Packages:** `playwright`, `google-api-python-client`, `watchdog`, `python-dotenv`, `pydantic`, `fastapi`, `uvicorn`
+- **Package Manager:** `uv` (or `pip`)
 
-**Implementation Requirements:**
-- Import and compose skills (never duplicate skill logic)
-- Maintain internal state as needed
-- Implement graceful error handling
-- Log all significant actions
-- Provide status reporting for observability
+### Node.js
+- **Version:** `20 or 22 LTS`
+- **Key Packages:** `@anthropic/mcp`, `zod`, `node-fetch`
+- **Avoid:** Node 24+ (MCP compatibility risks).
 
-**Error Handling:**
-- Catch and log all exceptions
-- Retry transient failures (network, API rate limits)
-- Fail gracefully with informative error messages
-- Report errors to MainAgent for coordination
+### Odoo
+- **Edition:** Odoo Community 19+
+- **Integration:** XML-RPC (JSON-RPC via MCP preferred)
+- **Database:** PostgreSQL 14+
 
-### Tasks Layer Standards
-**Location:** `tasks/task_name.json`
+---
 
-**Required Fields:**
-- `name`: Unique task identifier
-- `description`: Human-readable purpose
-- `agents`: Array of agent names required
-- `skills_required`: Array of skill names required
-- `schedule`: Execution schedule or "on_demand"
-- `success_criteria`: Object defining success conditions
-- `error_handling`: Retry and logging policies
+## 12. Development Phases (Mandatory Sequence)
 
-**Execution Requirements:**
-- Tasks executed by MainAgent
-- All task runs logged to chat_history
-- Success/failure status recorded
-- Errors trigger retry logic per task definition
+All major feature rollouts must follow this 8-phase sequence:
 
-### Chat History Standards
-**Location:** `chat_history/YYYY-MM-DD.json`
+1. **Foundation & Next.js:** Setup environment, dependencies, and frontend base.
+2. **Gmail Integration:** Email monitoring and notification systems.
+3. **WhatsApp Integration:** MCP, Skill, and Agent for messaging.
+4. **LinkedIn Integration:** MCP for professional networking.
+5. **Odoo/CRM Integration:** Lead capture and management.
+6. **Chatbot Integration:** Polish UI/UX and Gemini integration.
+7. **Vercel/Cloud Deployment:** Configuration and verification.
+8. **PWA & Mobile:** Manifest, service workers, and responsive updates.
 
-**Format:** JSON array of log entries
+---
 
-**Required Fields per Entry:**
-- `timestamp`: ISO-8601 formatted datetime
-- `task`: Task name or "manual" for ad-hoc actions
-- `agent`: Agent that performed the action (optional)
-- `action`: Description of action taken
-- `status`: "success", "failure", "in_progress"
-- `data`: Object with relevant context/results
+## 13. Ethical & Operational Limits
 
-**Retention Policy:**
-- Daily files for easy querying and archival
-- Retain indefinitely for audit trail
-- Files are append-only during the day
+The agent MUST NEVER autonomously:
+- Commit to legal agreements.
+- Handle emotionally sensitive conversations.
+- Perform financial transfers.
+- Execute irreversible actions without HITL.
 
-### MCP Server Standards
-**Location:** `src/mcp_servers/server_name.py`
+**The human owner remains fully accountable for all agent actions.**
 
-**Implementation Requirements:**
-- Follow official MCP specification
-- Expose tools, resources, and/or prompts
-- Handle authentication and credentials securely
-- Implement error handling and retries
-- Provide clear tool descriptions for AI agents
+---
 
-**Integration Requirements:**
-- Agents can import and use MCP server tools
-- MCP servers are stateless where possible
-- Configuration via environment variables
-- Logging of all MCP tool invocations
+## 14. Definition of Success
 
-### IX. Strict Development Phases
-**All major feature rollouts must follow this 8-phase sequence:**
+The Panaversity Assistant is considered **100% successful** when:
+- ✅ No relevant academic or business message is missed.
+- ✅ Leads are captured and logged automatically to Odoo.
+- ✅ Notifications arrive via both Email and WhatsApp.
+- ✅ HITL approvals are requested and enforced correctly.
+- ✅ Logs are complete, auditable, and retained for 90+ days.
+- ✅ The system runs continuously (24/7) with minimal supervision.
+- ✅ The chatbot can answer general questions and use all tools.
 
-1. **Foundation & Next.js**: Setup environment, dependencies (uv), and frontend base.
-2. **Gmail Integration**: Ensure email monitoring and notification systems work.
-3. **WhatsApp Integration**: Implement MCP, Skill, and Agent for messaging.
-4. **LinkedIn Integration**: Implement MCP for professional networking.
-5. **GitHub Integration**: specific repository management tasks.
-6. **Chatbot Integration**: Polish the UI/UX and Gemini integration.
-7. **Vercel Deployment**: Cloud configuration and deployment verification.
-8. **PWA & Mobile**: Manifest, service workers, and mobile-responsive updates.
+---
 
-## Development Workflow
-
-### Adding a New Skill
-1. Create `skills/skill_name/` directory
-2. Write `SKILL.md` documentation (purpose, usage, examples)
-3. Implement `skill_name.py` with clear interface
-4. Test skill independently
-5. Update `skills/README.md` with skill description
-6. Submit for review with test results
-
-### Adding a New Agent
-1. Create `src/agents/agent_name.py`
-2. Import required skills (never duplicate skill logic)
-3. Implement `__init__()` and `get_status()` methods
-4. Implement core agent action methods
-5. Add error handling and logging
-6. Update `MainAgent` to coordinate new agent if needed
-7. Test agent with real skills
-8. Document agent in `ARCHITECTURE.md`
-
-### Adding a New Task
-1. Create `tasks/task_name.json` with complete definition
-2. Ensure all required agents and skills exist
-3. Define clear success criteria
-4. Configure error handling and retry logic
-5. Add task execution method to `MainAgent` if needed
-6. Test task execution end-to-end
-7. Verify chat_history logging
-8. Update `tasks/README.md`
-
-### Adding a New MCP Server
-1. Create `src/mcp_servers/server_name.py`
-2. Implement MCP specification (tools/resources/prompts)
-3. Add authentication and configuration
-4. Document available tools and usage
-5. Test MCP server independently
-6. Integrate with relevant agents
-7. Update documentation
-
-## Quality Gates
-
-### Documentation Requirements
-- **Skills**: Must have `SKILL.md` with examples
-- **Agents**: Must be documented in `ARCHITECTURE.md`
-- **Tasks**: Must have clear description in JSON
-- **MCP Servers**: Must document available tools
-- **Code**: Docstrings for all public methods
-
-### Testing Requirements
-- **Skills**: Independently testable with unit tests
-- **Agents**: Integration tests with real skills
-- **Tasks**: End-to-end tests with chat_history verification
-- **MCP Servers**: Tool invocation tests
-
-### Code Quality Requirements
-- Type hints for all public methods
-- Error handling for all external calls (API, file I/O, network)
-- Logging for all significant actions
-- No hardcoded credentials or secrets
-- Configuration via environment variables
-
-### Observability Requirements
-- All agent actions logged to chat_history
-- Status reporting via `get_status()` methods
-- Error logging with stack traces
-- Performance metrics where relevant
-
-## Technology Stack
-
-### Core Technologies
-- **Language**: Python 3.12+
-- **Dependency Management**: `uv` (pyproject.toml)
-- **Architecture**: Skills → Agents → Tasks
-- **Logging**: JSON-based chat_history
-- **Configuration**: python-dotenv
-- **MCP**: Model Context Protocol servers
-
-### External Integrations
-- **Gmail API**: Email monitoring via gmail_monitoring skill
-- **SMTP**: Email notifications via email_notifications skill
-- **GitHub API**: Repository management via github_server MCP
-- **Playwright**: Web automation via playwright_server MCP
-- **WhatsApp**: Messaging via whatsapp_server MCP
-- **LinkedIn**: Networking via linkedin_server MCP
-
-### Mobile & PWA
-- **Manifest**: `manifest.json` required
-- **Service Worker**: For offline capabilities
-- **Responsive Design**: Mobile-first CSS
-
-### Future Integrations (Feature Flags)
-- **WhatsApp**: Enabled via `WHATSAPP_ENABLED=true`
-- **LinkedIn**: Enabled via `LINKEDIN_ENABLED=true`
-
-## Governance
+## 15. Governance
 
 ### Constitution Authority
-- This constitution supersedes all other development practices
-- All code reviews must verify compliance with constitution
-- Violations must be justified and documented
-- Constitution is the source of truth for architecture decisions
+- This constitution **supersedes** all other practices.
+- All code reviews MUST verify compliance.
+- Violations must be justified and documented.
 
 ### Amendment Process
-1. Propose amendment with rationale
-2. Document impact on existing code
-3. Obtain approval from project maintainers
-4. Update constitution with version increment
-5. Create migration plan for existing code
-6. Update `Last Amended` date
+1. Propose with rationale.
+2. Document impact.
+3. Obtain approval.
+4. Update version and `Last Amended` date.
 
-### Compliance Verification
-- All pull requests reviewed for constitution compliance
-- Skills must have `SKILL.md` documentation
-- Agents must implement `get_status()`
-- Tasks must log to chat_history
-- No hardcoded credentials allowed
-- Configuration must be environment-based
+---
 
-### Complexity Justification
-- Simple solutions preferred (YAGNI principle)
-- Complexity must be justified in code comments
-- Premature optimization avoided
-- Refactoring preferred over rewriting
-
-### Runtime Guidance
-- Use `ARCHITECTURE.md` for development guidance
-- Follow existing patterns in codebase
-- Consult `skills/README.md` for skill guidelines
-- Reference task definitions in `tasks/` for examples
-
-**Version**: 1.0.0 | **Ratified**: 2026-01-23 | **Last Amended**: 2026-01-23
+**Version:** 2.0.0 | **Ratified:** 2026-01-27 | **Last Amended:** 2026-01-27

@@ -24,9 +24,9 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Global initialization for Windows and Nested Loops
-if os.name == 'nt':
-    asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
-nest_asyncio.apply()
+# if os.name == 'nt':
+#    asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
+# nest_asyncio.apply()
 
 from src.agents.chat_agent import ChatAgent
 from src.agents.main_agent import MainAgent

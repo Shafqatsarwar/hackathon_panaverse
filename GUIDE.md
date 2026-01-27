@@ -1,107 +1,162 @@
 # Panaversity Student Assistant - Developer Guide 📘
 
-> **A Multi-Agent AI System for Student Success**  
-> Powered by Google Gemini 2.5, Odoo ERP, and Next.js 14.
-
----
-### Run backend:
-python -m uvicorn src.api.chat_api:app --reload --host 0.0.0.0 --port 8000
-
-###Run frontend:
-cd frontend
-npm run dev
-
-## 📚 Table of Contents
-1. [Project Overview](#1-project-overview)
-2. [Architecture & Agents](#2-architecture--agents)
-3. [Project Structure](#3-project-structure)
-4. [Setup & Credentials](#4-setup--credentials)
-5. [Running the Project](#5-running-the-project)
-6. [Troubleshooting](#6-troubleshooting)
+## 🌟 Project Overview
+The **Panaversity Student Assistant** is an Autonomous AI Agent designed to act as a *Personal AI Employee*. It uses a **File-System Based Architecture** (Platinum Tier) to manage tasks, monitor communications, and automate workflows across WhatsApp, Gmail, LinkedIn, and Odoo CRM.
 
 ---
 
-## 1. Project Overview
-This tool acts as a **autonomous 24/7 personal assistant** for students and staff. It unifies communication channels (Email, WhatsApp) with business data (Odoo CRM) through a single AI interface.
+## 🏗️ Architecture (The Platinum Tier)
 
-**Core Capabilities:**
-- **🧠 Intelligent Chat**: Uses Google Gemini to understand natural language requests.
-- **📧 Email Autopilot**: Monitors Gmail for keywords ("Deadline", "Exam"), categorizes them, and notifies the user.
-- **📊 Odoo Integration**: Automatically creates Leads in Odoo CRM from important emails or chat commands.
-- **💬 WhatsApp Bridge**: Sends alerts to your phone and lets you check messages from the web UI.
+The system works on a decoupled **Watcher -> Vault -> Brain** model, ensuring robustness and 24/7 reliability.
 
----
+### 1. The Vault (`data/vault/`) 🗄️
+The central memory functionality of the agent. It is a file-system based queue.
+- **`Inbox/`**: Raw incoming data (logs, temp files).
+- **`Needs_Action/`**: The "To-Do List". Watchers place Markdown files here.
+- **`Done/`**: Archive of completed tasks.
+- **`Company_Handbook.md`**: The rulebook defining how the Brain should react.
 
-## 2. Architecture & Agents
-The system is built on a **Multi-Agent Architecture**:
+### 2. The Watchers (`watchers.py`) 👀
+"The Senses" of the AI. These run continuously in the background.
+- **Role**: Monitor external inputs (WhatsApp, Gmail, LinkedIn).
+- **Action**: When a relevant event occurs (e.g., email with "Assignment"), it creates a standardized `.md` file in `Needs_Action/`.
+- **Key Feature**: Zero logic overlap with the Brain. It only *observes* and *reports*.
 
-### 🤖 Main Agent (`src/agents/main_agent.py`)
-The "Brain" that orchestrates background tasks. It runs on a schedule (e.g., every 15 mins) to check emails and sync data.
+### 3. The Brain (`brain_agent.py`) 🧠
+"The Muscle" of the AI. It processes the Vault.
+- **Role**: Watches the `Needs_Action/` folder for new files.
+- **Action**: Reads the task, determines the necessary skill (e.g., Odoo Sync, Reply), executes it via `MainAgent`, and moves the file to `Done/`.
+- **Loop**: The "Autonomous Loop" that ensures no task is ever dropped.
 
-### 💬 Chat Agent (`src/agents/chat_agent.py`)
-Handles real-time user interaction via the Web UI. It has access to **Tools**:
-- `_check_email_tool`: Reads unread emails.
-- `_check_whatsapp_tool`: Scrapes WhatsApp Web for messages.
-- `web_search`: Uses DuckDuckGo to answer general questions.
-
-### 📧 Email Agent (`src/agents/email_agent.py`)
-Connects to Gmail via IMAP/SMTP. Handles authentication and parsing.
-
-### 💼 Odoo Agent (`src/agents/odoo_agent.py`)
-Uses XML-RPC to talk to your Odoo instance. Can Read/Write Leads and Opportunities.
+### 4. The API & Frontend 💻
+- **Backend**: FastAPI (`src/api/chat_api.py`) providing endpoints/WebSockets.
+- **Frontend**: Next.js (`frontend/`) providing a Glassmorphic UI for user interaction.
 
 ---
 
-## 3. Project Structure
-Understanding the codebase folder by folder:
+## 📂 Project Structure
 
 ```bash
-hackathon_panaverse/
-├── src/                    # BACKEND (Python) 🐍
-│   ├── agents/             # The logic for each agent (Chat, Email, Odoo)
-│   ├── api/                # FastAPI Server (Routes, Websockets)
-│   ├── utils/              # Config, Logging, Helper functions
-│   └── main.py             # Background Process Entry Point
-│
-├── frontend/               # FRONTEND (Next.js/React) ⚛️
-│   ├── app/                # Page Logic (page.tsx) and Global Styles
-│   ├── public/             # Static Assets (Images, Icons)
-│   └── ...config files     # Tailwind, Next.js config
-│
-├── skills/                 # REUSABLE SKILLS 🛠️
-│   ├── whatsapp_skill/     # Browser Automation for WhatsApp
-│   ├── chatbot_skill/      # Gemini SDK integration
-│   └── web_search_skill/   # Search Engine integration
-│
-├── start.bat               # ⚡ ONE-CLICK RELEASE LAUNCHER
-├── manage.py               # 🛠️ DEVELOPER CLI TOOL
-└── INSTRUCTIONS.md         # 🔐 KEY SETUP & USAGE GUIDE
+Panaversity_Hackathon/
+├── data/
+│   └── vault/              # The "Memory" of the agent
+├── frontend/               # Next.js User Interface
+├── skills/                 # Modular Capabilities
+│   ├── chatbot_skill/      # Gemini AI Wrapper
+│   ├── email_filtering/    # Regex & NLP Filters
+│   ├── gmail_monitoring/   # Gmail API logic
+│   ├── linkedin_skill/     # Playwright Automation
+│   ├── odoo_skill/         # XML-RPC CRM Integration
+│   └── whatsapp_skill/     # WhatsApp Web Automation
+├── src/
+│   ├── agents/             # Logic Layers (Chat, Email, Odoo Agents)
+│   ├── api/                # FastAPI Endpoints
+│   └── mcp_servers/        # Model Context Protocol Servers
+├── brain_agent.py          # The Autonomous Processor
+├── watchers.py             # The Monitoring System
+├── manage.py               # CLI Management Utility
+└── start.bat               # Windows Quick Start Script
 ```
 
 ---
 
-## 4. Setup & Credentials
-Before running the code, you **must configure your credentials**.
-Please see the dedicated guide (it includes detailed steps for Gmail, Odoo, etc.):
+## 🛠️ Developer Setup Guide
 
-👉 **[READ: INSTRUCTIONS.md](INSTRUCTIONS.md)**
+### 1. Prerequisites
+- **Python 3.10+**: Ensure it's in your PATH.
+- **Node.js 18+**: For the frontend.
+- **Odoo Account**: URL, DB Name, Username, Password.
+- **Google API Key**: For Gemini.
+- **Gmail App Password**: For email access.
+
+### 2. Installation
+```powershell
+# 1. Clone & Install Python Deps
+git clone <repo_url>
+cd hackathon_panaverse
+pip install -r requirements.txt
+playwright install chromium
+
+# 2. Install Frontend Deps
+cd frontend
+npm install
+cd ..
+```
+
+### 3. Configuration (`.env`)
+Refer to `INSTRUCTIONS.md` for the exact variables required.
 
 ---
 
-## 5. Running the Project
-We provide 3 ways to run the application. See **[INSTRUCTIONS.md](INSTRUCTIONS.md)** for the quick-start guide.
+## 🚀 Running the Project (Developer Mode)
 
-**For Developers (Recommended Flow):**
-1.  Open `run_local_dev.bat` or use `python manage.py` (Option 1).
-2.  Edit code in `src/` or `frontend/`.
-3.  The servers (FastAPI and Next.js) will **auto-reload** upon saving changes.
+### A. Full System (Recommended)
+Use the management script to see all options:
+```powershell
+python manage.py
+```
+*Select "Run Full System" to start Backend, Frontend, and Autonomous Agents.*
+
+### B. Manual Component Start
+If you crave control, run each component in a separate terminal:
+
+**Terminal 1: The API (Backend)**
+```powershell
+# Serves the Chatbot & API at http://localhost:8000
+$env:PYTHONPATH='.'; python src/api/chat_api.py
+```
+
+**Terminal 2: The Frontend (UI)**
+```powershell
+# Serves the UI at http://localhost:3000
+cd frontend
+npm run dev
+```
+
+**Terminal 3: The Watchers (Sensors)**
+```powershell
+# Monitors Email/WhatsApp and populates Vault
+python watchers.py
+```
+
+**Terminal 4: The Brain (Processor)**
+```powershell
+# Processes Vault tasks autonomously
+python brain_agent.py
+```
 
 ---
 
-## 6. Troubleshooting
-- **"Hydration Error"**: Usually a mismatch between server/client HTML. Check `frontend/app/layout.tsx`.
-- **"WhatsApp Login Failed"**: You need to scan the QR code. Check the *Terminal Window* running the backend.
-- **"Odoo Access Denied"**: Verify your `ODOO_DB` and `ODOO_PASSWORD` in `.env`.
+## ☁️ Oracle Cloud Deployment Strategy
+To deploy this as a true "AI Employee" on a VPS (like Oracle Free Tier):
+
+1.  **Provision**: Ubuntu 22.04 VM (ARM/Ampere recommended).
+2.  **Setup**:
+    ```bash
+    sudo apt update && sudo apt install python3-pip nodejs npm
+    git clone <your_repo>
+    pip install -r requirements.txt
+    playwright install-deps
+    playwright install chromium
+    ```
+3.  **Headless Mode**: Ensure `headless=True` is set in `skills/whatsapp_skill/skill.py` and other Playwright scripts.
+4.  **Persistence**: Use `systemd` or `pm2` to keep scripts running.
+    ```bash
+    # Example PM2 usage
+    pm2 start src/api/chat_api.py --name "backend" --interpreter python3
+    pm2 start watchers.py --name "watchers" --interpreter python3
+    pm2 start brain_agent.py --name "brain" --interpreter python3
+    ```
 
 ---
-*Created for the Agents v3.0 Hackathon.*
+
+## 🧪 Testing Tools
+We provided scripts to test specific integrations in isolation:
+- `verify_whatsapp.py`: Test WhatsApp Connection.
+- `seed_linkedin.py`: Scrape LinkedIn & Feed Odoo.
+- `check_email_script.py`: Debug Gmail Filter logic.
+- `test_general_chat.py`: Verify Chatbot responses.
+
+---
+
+*For credential setup and 'how-to' users, please refer to* `INSTRUCTIONS.md`.

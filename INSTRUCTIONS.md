@@ -1,114 +1,100 @@
-# Quick Start Instructions 🚀
+# Panaversity Assistant - Quick Start & Credentials Guide 🚀
 
-Welcome to the **Panaversity Student Assistant**! 
-Follow these steps to get up and running quickly.
-
----
-
-## ⚡ Step 1: Credentials Setup
-**STOP!** Have you set up your API keys?
-
-To run the Panaversity Student Assistant, you need to configure several API keys and credentials. These should be stored in your `.env` file.
-
-**⚠️ SECURITY WARNING:** Never commit your `.env` file or these credentials to GitHub.
+Welcome to the **Panaversity Student Assistant**! This guide focuses on **Setting up your Environment** and **Getting your Credentials**.
 
 ---
 
-## 1. Quick Setup
-1. Copy `.env.example` to `.env` (if you haven't already).
-2. Fill in the values below.
+## ⚡ Step 1: Environment Variables (`.env`)
+
+To run the assistant, you must create a `.env` file in the root directory.
+**Never share this file.** It contains your secrets.
+
+1.  Copy `.env.example` -> `.env`.
+2.  Fill in the keys as described below.
 
 ---
 
-## 2. Required Credentials
+## 🔐 How to Get Your Credentials
 
-### 🤖 Google Gemini (AI Chatbot)
-Required for the chatbot to answer questions.
-- **Variable**: `GOOGLE_API_KEY`
-- **How to Get**: 
-  1. Go to [Google AI Studio](https://aistudio.google.com/).
-  2. Create a new API Key.
+### 1. 🤖 Google Gemini API (Free tier available)
+*Required for the Brain to think and Chat to work.*
+1.  Go to **[Google AI Studio](https://aistudio.google.com/)**.
+2.  Click **"Get API key"** in the top left.
+3.  Click **"Create API key"**.
+4.  Copy the string starting with `AIza...`.
+5.  **Update `.env`**:
+    ```ini
+    GOOGLE_API_KEY=AIzaSyB...
+    ```
 
-### 📧 Gmail (Email Monitoring)
-Required for checking emails and sending alerts.
-- **Variable**: `GMAIL_ADDRESS` (Your email)
-- **Variable**: `GMAIL_PASSWORD` (App Password, NOT your login password)
-- **How to Get**:
-  1. Go to Google Account > Security > 2-Step Verification (Enable it).
-  2. Go to "App passwords" (search for it).
-  3. Generate a new App Password for "Mail".
+### 2. 📧 Gmail App Password (NOT your normal password)
+*Required for monitoring emails safely.*
+1.  Go to your **[Google Account Security](https://myaccount.google.com/security)** page.
+2.  Enable **2-Step Verification** if it's off.
+3.  Search for **"App passwords"** in the search bar at the top (or look under 2-Step Verification options).
+4.  Create a new app name: `PanaversityBot`.
+5.  It will show you a 16-character code (e.g., `abcd efgh ijkl mnop`).
+6.  **Update `.env`**:
+    ```ini
+    GMAIL_ADDRESS=your.email@gmail.com
+    GMAIL_PASSWORD=abcdefghijklmnop  # No spaces needed
+    ```
 
-### 📊 Odoo (CRM/ERP)
-Required for creating and reading leads.
-- **Variable**: `ODOO_URL` (e.g., https://your-company.odoo.com)
-- **Variable**: `ODOO_DB` (Database name)
-- **Variable**: `ODOO_USERNAME` (Your login email)
-- **Variable**: `ODOO_PASSWORD` (API Key or Password)
+### 3. 📊 Odoo CRM Configuration
+*Required for Lead Management.*
+1.  **URL**: The link you use to login (e.g., `https://my-company.odoo.com`).
+2.  **Database (`ODOO_DB`)**:
+    - For Odoo Online (SaaS): This is usually the **subdomain** (e.g., `my-company` if url is `my-company.odoo.com`).
+    - *Tip*: Click your profile icon -> "My Databases" to confirm the exact name.
+3.  **Username/Password**: Your login credentials.
+4.  **Update `.env`**:
+    ```ini
+    ODOO_URL=https://excellence-links.odoo.com
+    ODOO_DB=excellence-links          # Just the name, NOT the URL
+    ODOO_USERNAME=admin@example.com
+    ODOO_PASSWORD=your_password
+    ```
 
-### 💬 WhatsApp (Alerts & Reading)
-Required for WhatsApp integration.
-- **Variable**: `WHATSAPP_ENABLED=true`
-- **Note**: This uses **WhatsApp Web automation**. No API key is strictly required, but you must scan the QR code on the first run.
+### 4. 💬 WhatsApp Integration
+*Uses Web Automation (No API key required).*
+1.  **Enable**: Set `WHATSAPP_ENABLED=true` in `.env`.
+2.  **Run**: When you start the watcher (`python watchers.py`), a browser window (or QR code in logs) will appear.
+3.  **Scan**: Use your phone (WhatsApp -> Linked Devices) to scan the QR code.
+4.  *Session is saved locally for future runs.*
 
----
-
-## 3. Optional Configuration
-
-### Social Media
-- **LinkedIn**: Set `LINKEDIN_ENABLED=true` and provide `LINKEDIN_EMAIL` / `LINKEDIN_PASSWORD`.
-
-### Admin Alerts
-- **Variable**: `ADMIN_EMAIL` (Where to send email alerts)
-- **Variable**: `ADMIN_WHATSAPP` (Your phone number for alerts, e.g., +923001234567)
-
----
-
-## 4. Troubleshooting Credentials
-- **Error: "Authentication Failed"**: Check if your App Password is correct.
-- **Error: "Odoo Connection Refused"**: Ensure your Odoo URL is reachable and DB name is exact.
-- **WhatsApp not working**: Make sure to scan the QR code in the terminal window.
-
----
-
-## 🚀 Step 2: How to Run
-Choose the method that suits you best:
-
-### Option A: The "Double-Click" (Easiest) 🖱️
-1. Go to the project folder.
-2. Double-click **`start.bat`**.
-3. Wait for two windows to open.
-4. The App will open in your browser automatically.
-
-### Option B: The "Management Console" (For Testers) 🛠️
-1. Open a terminal.
-2. Run: `python manage.py`
-3. Select an option from the menu (e.g., "Run Backend Only" or "Run Manual Check").
-
-### Option C: The "Dev Command" (For Coders) ⚡
-1. Open a terminal.
-2. Run: `.\start`
-3. Uses the same logic as Option A but keeps the main terminal open.
+### 5. 💼 LinkedIn Integration (Optional)
+*Uses Browser Automation.*
+1.  **Enable**: Set `LINKEDIN_ENABLED=true` in `.env`.
+2.  **Credentials**:
+    ```ini
+    LINKEDIN_EMAIL=your.linkedin@email.com
+    LINKEDIN_PASSWORD=your_password
+    ```
 
 ---
 
-## 💡 Step 3: How to Use
+## 🏃‍♀️ Step 2: How to Run (Quick Modes)
 
-### 💬 Chat with the AI
-Once the app is open at `http://localhost:3000`:
-- **Ask General Questions**: "What is Panaversity?" or "Find recent AI news".
-- **Check Emails**: "do I have any unread emails?"
-- **Check WhatsApp**: "Check my WhatsApp messages" or "Any messages about PIAIC?".
+### Option A: The "Developer" (Recommended)
+Use the menu to pick exactly what you want to run.
+```powershell
+python manage.py
+```
 
-### 🟢 Status Dashboard
-- **Top Right Buttons**:
-  - `Odoo`: Click to see connection status or toggle checks.
-  - `Email`: Shows if Gmail is authenticated.
-  - `WhatsApp`: Shows if automation is active.
-
-### 📱 WhatsApp Automation
-- **First Run**: Look at the *Backend Terminal*. If it says "Scan QR Code", you must scan it with your phone to log in.
-- **Alerts**: The system will automatically check for new messages every hour (or when you ask).
+### Option B: The "One-Click" (Windows)
+Double-click `start.bat`. This opens the API and Frontend automatically.
 
 ---
 
-See **[GUIDE.md](GUIDE.md)** for detailed developer documentation.
+## � System Dashboard
+Once running at `http://localhost:3000`:
+- **Green Dot**: Connected to API.
+- **Odoo Button**: Green = Connected to CRM.
+- **Email Button**: Green = Gmail Authenticated.
+
+---
+
+## ❓ Troubleshooting
+- **"Authentication Failed" (Gmail)**: You used your real password. Use an **App Password**.
+- **"Database not found" (Odoo)**: Double check `ODOO_DB`. It is usually *not* the full URL.
+- **"Browser closed" (WhatsApp)**: The automation needs the browser open to work. Don't close the automation window manually.

@@ -299,3 +299,32 @@ class MainAgent:
             }
         }
 
+    def process_trigger(self, source: str, event_data: Dict[str, Any]):
+        """
+        Hook: Process external triggers (like WhatsApp 'Panaverse' message).
+        Used by the Autonomous Runner.
+        """
+        logger.info(f"Main Agent: Trigger received from {source}!")
+        
+        # Log Trigger
+        self._log_to_chat_history("trigger_received", {"source": source, "data": event_data})
+        
+        # Logic: If trigger is from WhatsApp/Email about Panaverse -> Run Analysis or Actions
+        trigger_summary = f"Trigger from {source}: {json.dumps(event_data)}"
+        
+        # 1. Notify Admin via WhatsApp (if urgency high)
+        if self.whatsapp_agent:
+            self.whatsapp_agent.send_alert(f"🔔 System Trigger: {trigger_summary[:100]}...")
+
+        # 2. Sync to Odoo if it's a message/lead
+        if source == "whatsapp" or source == "linkedin":
+            if self.odoo_agent and self.odoo_agent.enabled:
+                sender = event_data.get('sender', 'Unknown')
+                content = event_data.get('last_message') or event_data.get('content') or ""
+                self.odoo_agent.create_lead_from_email({
+                    "subject": f"Trigger from {source}: {sender}",
+                    "sender": sender,
+                    "body": content
+                })  # Reusing email method for now or add generic create_lead
+        
+        logger.info("Main Agent: Trigger processing complete.")

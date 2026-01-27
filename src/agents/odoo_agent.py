@@ -27,6 +27,48 @@ class OdooAgent:
         description = f"Generated from Email.\nSender: {sender}\n\nBody:\n{body}"
         
         logger.info(f"OdooAgent: Creating Lead for '{subject}'...")
+        
+        return self.skill.create_lead(
+            name=subject,
+            email_from=sender,
+            description=description
+        )
+        
+    def create_lead_from_linkedin(self, message_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Create a CRM lead from a LinkedIn message"""
+        if not self.enabled:
+            return {"success": False, "error": "Odoo disabled"}
+            
+        sender = message_data.get("sender", "Unknown")
+        content = message_data.get("content", "")
+        
+        description = f"Source: LinkedIn Message\n\nContent:\n{content}"
+        
+        logger.info(f"OdooAgent: Creating LinkedIn Lead from '{sender}'...")
+        return self.skill.create_lead(
+            name=f"LinkedIn Inquiry: {sender}",
+            email_from="linkedin@placeholder.com", 
+            description=description
+        )
+        
+    def create_lead(self, name: str, email: str, description: str) -> Dict[str, Any]:
+        """Create a generic lead (proxy to skill)"""
+        if not self.enabled: return {"success": False, "error": "Disabled"}
+        return self.skill.create_lead(name, email, description)
+
+    def get_recent_leads(self, limit: int = 5) -> Dict[str, Any]:
+        """Get recent leads (proxy to skill)"""
+        if not self.enabled: return []
+        return self.skill.get_leads(limit)
+        """Create a generic lead (proxy to skill)"""
+        if not self.enabled: return {"success": False, "error": "Disabled"}
+        return self.skill.create_lead(name, email, description)
+
+    def get_recent_leads(self, limit: int = 5) -> Dict[str, Any]:
+        """Get recent leads (proxy to skill)"""
+        if not self.enabled: return []
+        return self.skill.get_leads(limit)
+
     def get_recent_leads_summary(self) -> str:
         """Get a text summary of recent leads for the chatbot"""
         if not self.enabled:
