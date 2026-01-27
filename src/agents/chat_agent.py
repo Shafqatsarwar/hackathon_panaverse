@@ -17,10 +17,11 @@ class ChatAgent:
     
     def __init__(self):
         # Initialize Chatbot Skill
+        # Using gemini-2.0-flash (1500 req/day free tier) instead of 2.5-flash (20/day)
         self.chatbot_skill = ChatbotSkill(
             api_key=Config.GOOGLE_API_KEY,
-            model_name='gemini-2.5-flash',
-            fallback_models=['gemini-2.0-flash-thinking-exp', 'gemini-1.5-pro']
+            model_name='gemini-2.0-flash',
+            fallback_models=['gemini-1.5-flash', 'gemini-1.5-pro']
         )
         
         # Initialize Skills
