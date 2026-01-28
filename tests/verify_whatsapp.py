@@ -1,25 +1,56 @@
-import sys
-import os
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+"""
+Verify WhatsApp Login Script
+Run this to open WhatsApp Web and scan the QR code.
+"""
+import asyncio
+import logging
+from skills.whatsapp_skill.skill import WhatsAppSkill
 
-from src.agents.whatsapp_agent import WhatsAppAgent
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
-def test_whatsapp_agent():
-    print("Testing WhatsApp Agent...")
-    agent = WhatsAppAgent()
+async def verify_login():
+    print("Initializing WhatsApp Skill...")
+    # Headless=False to see the browser
+    skill = WhatsAppSkill(headless=False)
     
-    # Test status
-    status = agent.get_status()
-    print(f"Agent Status: {status}")
+    print("Opening WhatsApp Web...")
+    print("Please scan the QR code if prompted.")
+    print("If you are already logged in, the window will close automatically after verification.")
     
-    # Test sending alert (should be skipped if disabled, or mock sent)
-    result = agent.send_alert("Test message from Verification")
-    print(f"Send Result: {result}")
+    # We use a dummy number to trigger the browser open flow, 
+    # but we just want to reach the main page.
+    # Actually, let's call a specific login_only method if we implement it, 
+    # or just use the internal browser method with a dummy check.
     
-    if result.get("success") or result.get("error") == "Disabled" or "WhatsApp integration is disabled" in result.get("error", ""):
-        print("PASS: Agent handled request gracefully")
-    else:
-        print("FAIL: Unexpected response")
+    try:
+        # Custom logic similar to internal _send_via_browser but just for login
+        from playwright.async_api import async_playwright
+        async with async_playwright() as p:
+            user_data_dir = "./whatsapp_session"
+            context = await p.chromium.launch_persistent_context(
+                user_data_dir,
+                headless=False,
+                args=["--disable-blink-features=AutomationControlled"]
+            )
+            
+            page = context.pages[0] if context.pages else await context.new_page()
+            
+            await page.goto("https://web.whatsapp.com")
+            
+            try:
+                # Wait up to 10s for session to be recognized
+                await page.wait_for_selector("#pane-side", timeout=10000)
+                print("SUCCESS: WhatsApp session is ACTIVE!")
+            except Exception:
+                print("TIMEOUT: Login failed or QR code not scanned.")
+            
+            print("Closing browser...")
+            await context.close()
+            
+    except Exception as e:
+        print(f"Error: {e}")
 
 if __name__ == "__main__":
-    test_whatsapp_agent()
+    asyncio.run(verify_login())

@@ -1,4 +1,5 @@
 @echo off
+setlocal enabledelayedexpansion
 cd /d "%~dp0"
 title Panaversity Assistant Launcher
 color 0b
@@ -8,9 +9,22 @@ echo      Panaversity Student Assistant - Auto Launcher
 echo ========================================================
 echo.
 
-echo [INFO] Starting Panaversity Assistant...
+:: 1. Cleanup First
+echo [INFO] Ensuring ports are clear...
+taskkill /F /IM python.exe /T >nul 2>&1
+taskkill /F /IM node.exe /T >nul 2>&1
+timeout /t 2 >nul
 
-:: Install Frontend Deps if missing (Simple check)
+:: 2. Determine Python Interpreter
+set "PYTHON_EXE=python"
+if exist ".venv\Scripts\python.exe" (
+    set "PYTHON_EXE=.venv\Scripts\python.exe"
+    echo [INFO] Using Virtual Environment
+) else (
+    echo [INFO] Using System Python
+)
+
+:: 3. Frontend Setup
 if not exist "frontend\node_modules" (
     echo [SETUP] Installing Frontend Dependencies...
     cd frontend
@@ -18,23 +32,27 @@ if not exist "frontend\node_modules" (
     cd ..
 )
 
-echo [1/2] Launching Backend Server (New Window)...
-start "Backend API (Port 8000)" cmd /k "python -m uvicorn src.api.chat_api:app --reload --host 0.0.0.0 --port 8000"
+:: 4. Start Backend (New Window)
+echo [START] Launching Backend API (Port 8000)...
+set "PYTHONPATH=%CD%"
+start "Backend API" cmd /k "%PYTHON_EXE% src/api/chat_api.py"
 
-echo [WAIT] Waiting for backend to initialize...
+:: Delay for backend start
 timeout /t 5 >nul
 
-echo [2/2] Launching Frontend Interface (New Window)...
+:: 5. Start Frontend (New Window)
+echo [START] Launching Frontend UI (Port 3000)...
 cd frontend
-start "Next.js Frontend (Port 3000)" cmd /k "npm run dev"
+start "Next.js Frontend" cmd /k "npm run dev"
+cd ..
 
 echo.
 echo ========================================================
-echo [SUCCESS] System is running!
+echo [SUCCESS] System Starting...
 echo.
-echo  - Frontend: http://localhost:3000
-echo  - Backend:  http://localhost:8000
+echo Backend:  http://localhost:8000/api/status
+echo Frontend: http://localhost:3000
 echo.
-echo You can close this window now.
+echo Use 'stop.bat' to stop everything.
 echo ========================================================
 pause

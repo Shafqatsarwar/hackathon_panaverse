@@ -25,7 +25,7 @@ class WhatsAppAgent:
         # We'll use the ones from Config + explicit ones if needed, 
         # but for now rely on Config which user implied they updated/we should use.
         keywords = Config.FILTER_KEYWORDS
-        return self.skill.check_unread_messages(keywords=keywords, limit=limit)
+        return self.skill.check_messages(keywords=keywords, limit=limit)
 
     def get_status(self) -> Dict[str, Any]:
         return {

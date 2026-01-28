@@ -31,7 +31,7 @@ PANAVERSITY SKILL VERIFICATION - 2 INPUTS PER SKILL
    Input 1: Initialize model
    Result: Model ready
    Input 2: generate_response('Say hello')
-   Result: Got response (1778 chars)
+   Result: Got response (5 chars)
    STATUS: PASS
 
 [5] EMAIL FILTERING SKILL

@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 class ChatbotSkill:
     """Skill for AI generation using Gemini"""
     
-    def __init__(self, api_key: str, model_name: str = 'gemini-2.0-flash', fallback_models: list = None):
+    def __init__(self, api_key: str, model_name: str = 'gemini-2.5-flash', fallback_models: list = ['gemini-3.0-flash']):
         if not api_key:
             logger.warning("ChatbotSkill: No API Key provided")
             self.model = None

@@ -92,20 +92,28 @@ Full Data: {json.dumps(data, indent=2)}
         self.processed_ids.add(identifier)
 
     async def _poll_whatsapp(self):
-        if not self.whatsapp_skill.enabled: return
+        """Poll WhatsApp for new messages matching keywords"""
+        if not self.whatsapp_skill.enabled:
+            return
         
         logger.info("Watcher: Scanning WhatsApp...")
         keywords = Config.FILTER_KEYWORDS + ["Panaversity", "Panaverse", "PIAIC", "Urgent", "Help"]
         
-        loop = asyncio.get_running_loop()
-        msgs = await loop.run_in_executor(None, self.whatsapp_skill.check_messages, keywords)
-        
-        if msgs and isinstance(msgs, list) and len(msgs) > 0 and ("error" not in msgs[0]):
-            for msg in msgs:
-                if "error" in msg: continue
-                # Unique ID: Sender + part of content
-                uid = f"{msg.get('title')}_{str(msg.get('last_message'))[:20]}"
-                self.create_markdown_task("whatsapp", msg, uid)
+        try:
+            # Use the async interface directly (V3.0)
+            msgs = await self.whatsapp_skill.check_messages_async(keywords=keywords, limit=20)
+            
+            if msgs and isinstance(msgs, list) and len(msgs) > 0 and ("error" not in msgs[0]):
+                for msg in msgs:
+                    if "error" in msg:
+                        continue
+                    # Unique ID: Sender + part of content
+                    uid = f"{msg.get('title')}_{str(msg.get('last_message'))[:20]}"
+                    self.create_markdown_task("whatsapp", msg, uid)
+            else:
+                logger.info("Watcher: No WhatsApp messages found matching keywords")
+        except Exception as e:
+            logger.error(f"Watcher: WhatsApp polling error: {e}")
 
     async def _poll_gmail(self):
         if not self.gmail_authenticated: return
