@@ -133,7 +133,7 @@ class WhatsAppSkill:
     async def send_message_async(self, number: str, message: str) -> Dict[str, Any]:
         """
         Send a WhatsApp message (async version).
-        This is the primary async interface.
+        Supports Phone Number (+123...) OR Name ("Sir Junaid").
         """
         if not self.enabled:
             return {"success": False, "error": "WhatsApp skill is disabled"}
@@ -143,47 +143,122 @@ class WhatsAppSkill:
             return {"success": False, "error": "Failed to initialize browser or login"}
         
         try:
-            clean_number = number.replace("+", "").replace(" ", "").replace("-", "")
-            from urllib.parse import quote
-            encoded_message = quote(message)
+            is_number = number.replace("+", "").replace("-", "").strip().isdigit()
             
-            send_url = f"https://web.whatsapp.com/send?phone={clean_number}&text={encoded_message}"
-            logger.info(f"WhatsApp Skill: Navigating to send message to {clean_number}...")
-            
-            await page.goto(send_url)
-            
-            # Wait for input box OR invalid number popup
+            if is_number:
+                # Direct Navigation for Numbers
+                clean_number = number.replace("+", "").replace(" ", "").replace("-", "")
+                from urllib.parse import quote
+                encoded_message = quote(message)
+                send_url = f"https://web.whatsapp.com/send?phone={clean_number}&text={encoded_message}"
+                logger.info(f"WhatsApp Skill: Navigating to send message to {clean_number}...")
+                await page.goto(send_url)
+            else:
+                # SMART SEARCH for Names
+                logger.info(f"WhatsApp Skill: Searching for contact/group '{number}'...")
+                
+                # 1. Click Search
+                search_selectors = [
+                    'div[contenteditable="true"][data-tab="3"]',
+                    'div[aria-label="Search"]',
+                    'div[title="Search input textbox"]',
+                    'button[aria-label="Search or start new chat"]'
+                ]
+                
+                search_box = None
+                for sel in search_selectors:
+                    if await page.locator(sel).count() > 0:
+                        search_box = page.locator(sel).first
+                        break
+                        
+                if not search_box:
+                    # Fallback: Just type '/' to focus search usually? Or 'Ctrl+F' logic?
+                    # Let's try locating by placeholder text
+                    search_box = page.get_by_placeholder("Search", exact=False).first
+                
+                if search_box:
+                    await search_box.click()
+                    await page.wait_for_timeout(500)
+                    await page.keyboard.type(number)
+                    await page.wait_for_timeout(3000) # Wait for results
+                    
+                    # 2. Select Result (Avoiding Meta AI)
+                    logger.info("WhatsApp Skill: analyzing search results...")
+                    
+                    # Get all rows in the results pane
+                    pane = page.locator('#pane-side') # The scrolling list container
+                    rows = pane.locator('div[role="row"]')
+                    
+                    found_contact = False
+                    count = await rows.count()
+                    
+                    for i in range(count):
+                        row = rows.nth(i)
+                        text = await row.text_content()
+                        
+                        # SKIP Meta AI or "Ask Meta AI" or "Search for..."
+                        if "Meta AI" in text or "Ask Meta AI" in text:
+                            continue
+                            
+                        # If it matches our search largely, click it
+                        # Or simply click the first NON-Meta result
+                        logger.info(f"WhatsApp Skill: Clicking result: {text[:30]}...")
+                        await row.click()
+                        found_contact = True
+                        break
+                        
+                    if not found_contact:
+                        # Fallback: Try strict title match if fuzzy failed
+                        logger.warning("WhatsApp Skill: No valid contact found in results. Trying strict match...")
+                        strict_sel = f'span[title="{number}"]'
+                        if await page.locator(strict_sel).count() > 0:
+                            await page.locator(strict_sel).first.click()
+                        else:
+                            return {"success": False, "error": f"Contact '{number}' not found (and avoided Meta AI)."}
+                else:
+                    return {"success": False, "error": "Could not find search box"}
+
+            # Wait for input box to appear (confirming chat open)
             input_selector = 'footer div[contenteditable="true"]'
-            
             start_time = time.time()
             found_input = False
             
             while time.time() - start_time < 30:
-                # Check for invalid number popup
-                if await page.locator('div[data-testid="popup-controls-ok"]').is_visible():
+                # Check for invalid number popup (only for phone numbers)
+                if is_number and await page.locator('div[data-testid="popup-controls-ok"]').is_visible():
                     logger.warning("WhatsApp Skill: Invalid number detected.")
                     await self._cleanup()
                     return {"success": False, "error": "Invalid WhatsApp number."}
                 
-                # Check for input box
                 if await page.locator(input_selector).is_visible():
                     found_input = True
                     break
-                    
                 await asyncio.sleep(1)
             
             if not found_input:
-                raise TimeoutError("Chat input did not appear in time.")
+                raise TimeoutError("Chat input did not appear in time (Contact not found?).")
             
             # Focus and send
             await page.locator(input_selector).focus()
+            
+            # If we used search, we still need to type the message
+            if not is_number:
+                for line in message.split('\n'):
+                    await page.keyboard.type(line)
+                    await page.keyboard.down("Shift")
+                    await page.keyboard.press("Enter")
+                    await page.keyboard.up("Shift")
+            else:
+                # Message is already in box from URL, just needs focus?
+                # Sometimes URL navigation pre-fills but doesn't send.
+                # Actually, URL param pre-fills it.
+                pass
+                
             await page.wait_for_timeout(1000)
             await page.keyboard.press("Enter")
             
-            logger.info("WhatsApp Skill: Message submitted, waiting for network sync...")
+            logger.info("WhatsApp Skill: Message submitted.")
             await page.wait_for_timeout(3000)
-            
-            logger.info("WhatsApp Skill: Message sent successfully.")
             return {"success": True, "status": "sent"}
             
         except Exception as e:
@@ -204,7 +279,7 @@ class WhatsAppSkill:
     ) -> List[Dict[str, Any]]:
         """
         Check WhatsApp messages (async version).
-        This is the primary async interface.
+        Robust Archived folder logic using text-based locators.
         """
         if not self.enabled:
             return [{"error": "WhatsApp skill is disabled"}]
@@ -227,7 +302,11 @@ class WhatsAppSkill:
                         # Get Title
                         title_el = row.locator('[dir="auto"][title]')
                         if not await title_el.count():
-                            continue
+                            # Sometimes title doesn't have [title] attr, just text
+                            title_el = row.locator('div._ak8q span') # Generic class fallback? Risky.
+                            if not await title_el.count():
+                                continue
+
                         title = await title_el.first.text_content()
                         
                         # Get Last Message preview
@@ -265,26 +344,13 @@ class WhatsAppSkill:
             if check_archived:
                 logger.info("WhatsApp Skill: Checking Archived folder (PRIORITY)...")
                 try:
-                    # Robust selectors for Archived button
-                    archived_selectors = [
-                        'button[aria-label="Archived"]',
-                        '[data-testid="archived"]',
-                        'span[data-icon="archived"]',
-                        'div[title="Archived"]',
-                        'span[title="Archived"]',
-                        '//span[text()="Archived"]' 
-                    ]
+                    # ROBUST STRATEGY: Look for text "Archived" specifically
+                    # This finds the Archived row/button regardless of CSS classes
+                    archived_btn = page.get_by_text("Archived", exact=True).first
                     
-                    found_archive = False
-                    for selector in archived_selectors:
-                        btn = page.locator(selector)
-                        if await btn.count() > 0 and await btn.first.is_visible():
-                            logger.info(f"WhatsApp Skill: Found Archived button using selector: {selector}")
-                            await btn.first.click()
-                            found_archive = True
-                            break
-                    
-                    if found_archive:
+                    if await archived_btn.is_visible():
+                        logger.info("WhatsApp Skill: Found 'Archived' text, clicking...")
+                        await archived_btn.click()
                         await page.wait_for_timeout(1000)
                         
                         archived_chats = await parse_chats()
@@ -292,18 +358,17 @@ class WhatsAppSkill:
                             c['source'] = 'archived'
                         messages_found.extend(archived_chats)
                         
-                        # Go back to main list (click back or similar if needed, usually Archived opens in place)
-                        # WhatsApp specific: Archived view has a back button or clicking Archived again might not work.
-                        # Usually there is a back button in the header.
+                        # Go back
                         back_btn = page.locator('[data-icon="back"], button[aria-label="Back"]')
                         if await back_btn.count() > 0:
                             await back_btn.first.click()
                         else:
-                            # Try clicking the "Archived" title to go back? Or just reload?
-                            # Safer to reload or re-navigate to ensure we are at root for main scan
+                            # If back button not found, try reloading to root
                             await page.goto("https://web.whatsapp.com")
                             await page.wait_for_timeout(2000)
-                            
+                    else:
+                        logger.warning("WhatsApp Skill: 'Archived' text not visible.")
+                        
                 except Exception as e:
                     logger.warning(f"WhatsApp Skill: Archived check failed: {e}")
 
