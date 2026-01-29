@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  watcher:
+    build: .
+    container_name: panaversity_watcher
+    restart: unless-stopped
+    volumes:
+      # Persist Vault Data (Tasks, Logs)
+      - ./data/vault:/app/data/vault
+      # Persist WhatsApp Session (Critical for 24/7)
+      - ./whatsapp_session:/app/whatsapp_session
+      # Persist LinkedIn Session
+      - ./linkedin_session:/app/linkedin_session
+      # Persist Logs
+      - ./logs:/app/logs
+      # Mount .env for configuration
+      - ./.env:/app/.env
+    environment:
+      - PYTHONUNBUFFERED=1
+    network_mode: host # Useful for simple networking, though bridge is fine usually

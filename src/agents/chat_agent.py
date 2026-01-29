@@ -48,10 +48,15 @@ class ChatAgent:
         self.whatsapp_agent = WhatsAppAgent()
         self.linkedin_agent = LinkedInAgent()
         
+        # Initialize Notification Agent for sending emails
+        from src.agents.notification_agent import NotificationAgent
+        self.notification_agent = NotificationAgent()
+        
         # Define Tools
         self.tools = [
             self.web_search_skill.search, 
             self._check_email_tool,
+            self._send_email_tool,
             self._create_lead_tool,
             self._get_leads_tool,
             self._check_whatsapp_tool,
@@ -77,7 +82,8 @@ Your capabilities and skills (available via tools):
 
 1. **Email Management**:
    - Check inbox for important emails (Quiz, Assignment, etc.)
-   - Tool: `_check_email_tool`
+   - Send emails to any recipient
+   - Tools: `_check_email_tool`, `_send_email_tool`
 
 2. **Web Search**:
    - Search the web for current events, facts, or general knowledge.
@@ -88,8 +94,9 @@ Your capabilities and skills (available via tools):
    - Retrieve recent leads to provide updates.
    - Tools: `_create_lead_tool`, `_get_leads_tool`
 
-3. **Email Notifications**:
-   - System automatically notifies admin of high-priority emails.
+4. **Email Notifications**:
+   - Send emails to users with summaries and updates.
+   - Tool: `_send_email_tool`
 
 4. **WhatsApp**:
    - Check unread messages (filtered by keywords like Panaversity, PIAIC, etc.)
@@ -145,6 +152,33 @@ Be helpful, concise, and professional. Use emojis sparingly to make responses fr
         except Exception as e:
             logger.error(f"Email tool error: {e}")
             return f"Failed to check emails: {str(e) or 'Unknown error'}"
+    
+    def _send_email_tool(self, to_email: str, subject: str, body: str) -> str:
+        """
+        Send an email to a specified recipient.
+        
+        Args:
+            to_email: Recipient email address
+            subject: Email subject line
+            body: Email body content
+        """
+        try:
+            if not self.notification_agent:
+                return "Error: Email notification system is not initialized."
+            
+            result = self.notification_agent.send_email(
+                to_email=to_email,
+                subject=subject,
+                body=body
+            )
+            
+            if result.get("success"):
+                return f"Email sent successfully to {to_email}!"
+            else:
+                return f"Failed to send email: {result.get('error', 'Unknown error')}"
+        except Exception as e:
+            logger.error(f"Send email tool error: {e}")
+            return f"Failed to send email: {str(e)}"
 
     def _create_lead_tool(self, name: str, description: str, email: str = "unknown@example.com") -> str:
         """Create a new lead or opportunity in Odoo CRM."""

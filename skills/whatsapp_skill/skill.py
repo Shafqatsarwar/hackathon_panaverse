@@ -37,18 +37,49 @@ class WhatsAppSkill:
         """
         Waits for the user to be logged in. 
         Returns True if logged in, False if timeout.
+        Uses multiple fallback selectors for better reliability.
         """
         logger.info("WhatsApp Skill: Waiting for login (QR Scan might be needed)...")
+        
+        # Multiple selectors to try - WhatsApp UI changes frequently
+        selectors = [
+            '[data-testid="chat-list"]',  # Main chat list
+            '#pane-side',  # Side panel
+            '[data-icon="new-chat-outline"]',  # New chat button
+            'div[role="application"]',  # Main app container
+            'header[data-testid="chatlist-header"]',  # Chat list header
+            'div[aria-label*="Chat list"]',  # Chat list aria label
+            'button[aria-label*="New chat"]',  # New chat button
+            'div._3OvU8',  # WhatsApp main panel class (may change)
+        ]
+        
         try:
-            # Wait for the main chat list wrapper
-            await page.wait_for_selector(
-                '[data-testid="chat-list"], #pane-side, [data-icon="new-chat-outline"]', 
-                timeout=60000
-            )
-            logger.info("WhatsApp Skill: Login detected successfully.")
+            # Try each selector with a shorter timeout
+            for i, selector in enumerate(selectors):
+                try:
+                    logger.info(f"WhatsApp Skill: Trying selector {i+1}/{len(selectors)}: {selector[:50]}...")
+                    # Increased to 60 seconds per selector as requested
+                    await page.wait_for_selector(selector, timeout=60000, state='visible')
+                    logger.info(f"WhatsApp Skill: Login detected successfully using selector: {selector[:50]}")
+                    return True
+                except Exception:
+                    continue  # Try next selector
+            
+            # If all selectors failed, try one more time with a combined selector
+            logger.info("WhatsApp Skill: Trying combined selector as final attempt...")
+            combined_selector = ', '.join(selectors[:5])
+            await page.wait_for_selector(combined_selector, timeout=60000)
+            logger.info("WhatsApp Skill: Login detected successfully with combined selector")
             return True
+            
         except Exception as e:
-            logger.error(f"WhatsApp Skill: Login timeout: {e}")
+            logger.error(f"WhatsApp Skill: Login timeout after trying all selectors: {e}")
+            # Take screenshot for debugging
+            try:
+                await page.screenshot(path="whatsapp_login_timeout.png")
+                logger.info("WhatsApp Skill: Screenshot saved to whatsapp_login_timeout.png")
+            except:
+                pass
             return False
 
     async def _init_browser(self) -> Optional[Page]:
@@ -72,7 +103,8 @@ class WhatsAppSkill:
             page = self._context.pages[0] if self._context.pages else await self._context.new_page()
             
             if "web.whatsapp.com" not in page.url:
-                await page.goto("https://web.whatsapp.com", wait_until="domcontentloaded")
+                # Increased timeout to 60 seconds for slow connections
+                await page.goto("https://web.whatsapp.com", wait_until="domcontentloaded", timeout=60000)
             
             if not await self._wait_for_login(page):
                 await self._cleanup()
@@ -229,18 +261,30 @@ class WhatsAppSkill:
                         continue  # Skip buggy row
                 return results
 
-            # 1. Scan Main Chat List
-            logger.info("WhatsApp Skill: Scanning main chat list...")
-            main_chats = await parse_chats()
-            messages_found.extend(main_chats)
-            
-            # 2. Check Archived (if requested)
+            # 1. Check Archived (PRIORITY)
             if check_archived:
-                logger.info("WhatsApp Skill: Checking Archived folder...")
+                logger.info("WhatsApp Skill: Checking Archived folder (PRIORITY)...")
                 try:
-                    archived_btn = page.locator('button[aria-label="Archived"], [data-testid="archived"]')
-                    if await archived_btn.count() > 0 and await archived_btn.first.is_visible():
-                        await archived_btn.first.click()
+                    # Robust selectors for Archived button
+                    archived_selectors = [
+                        'button[aria-label="Archived"]',
+                        '[data-testid="archived"]',
+                        'span[data-icon="archived"]',
+                        'div[title="Archived"]',
+                        'span[title="Archived"]',
+                        '//span[text()="Archived"]' 
+                    ]
+                    
+                    found_archive = False
+                    for selector in archived_selectors:
+                        btn = page.locator(selector)
+                        if await btn.count() > 0 and await btn.first.is_visible():
+                            logger.info(f"WhatsApp Skill: Found Archived button using selector: {selector}")
+                            await btn.first.click()
+                            found_archive = True
+                            break
+                    
+                    if found_archive:
                         await page.wait_for_timeout(1000)
                         
                         archived_chats = await parse_chats()
@@ -248,13 +292,25 @@ class WhatsAppSkill:
                             c['source'] = 'archived'
                         messages_found.extend(archived_chats)
                         
-                        # Go back
-                        await page.locator('[data-icon="back"], [data-testid="back"]').first.click()
-                        await page.wait_for_timeout(500)
-                    else:
-                        logger.info("No Archived button found (maybe no archived chats).")
+                        # Go back to main list (click back or similar if needed, usually Archived opens in place)
+                        # WhatsApp specific: Archived view has a back button or clicking Archived again might not work.
+                        # Usually there is a back button in the header.
+                        back_btn = page.locator('[data-icon="back"], button[aria-label="Back"]')
+                        if await back_btn.count() > 0:
+                            await back_btn.first.click()
+                        else:
+                            # Try clicking the "Archived" title to go back? Or just reload?
+                            # Safer to reload or re-navigate to ensure we are at root for main scan
+                            await page.goto("https://web.whatsapp.com")
+                            await page.wait_for_timeout(2000)
+                            
                 except Exception as e:
-                    logger.warning(f"Failed to check archived: {e}")
+                    logger.warning(f"WhatsApp Skill: Archived check failed: {e}")
+
+            # 2. Scan Main Chat List
+            logger.info("WhatsApp Skill: Scanning main chat list...")
+            main_chats = await parse_chats()
+            messages_found.extend(main_chats)
             
             return messages_found
             

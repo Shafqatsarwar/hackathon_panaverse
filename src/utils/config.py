@@ -56,6 +56,10 @@ class Config:
     # Keywords for filtering
     FILTER_KEYWORDS = os.getenv("FILTER_KEYWORDS", "Panversity,PIAIC,Quiz,Assignment,Exam,Deadline").split(",")
     
+    # Forwarding Configuration
+    WHATSAPP_FORWARD_MESSAGES = os.getenv("WHATSAPP_FORWARD_MESSAGES", "")  # WhatsApp number to forward to
+    EMAIL_FORWARD_EMAIL = os.getenv("EMAIL_FORWARD_EMAIL", "")  # Email address to forward to
+    
     @classmethod
     def validate(cls) -> List[str]:
         """Validate configuration and return list of errors"""

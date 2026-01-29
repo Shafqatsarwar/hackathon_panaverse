@@ -1,31 +1,27 @@
-2026/01/28-00:43:27.799 1f34 Reusing MANIFEST D:\Panavers\Projects\hackathon_panaverse\whatsapp_session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
-2026/01/28-00:43:27.800 1f34 Recovering log #2261
-2026/01/28-00:43:27.867 1f34 Reusing old log D:\Panavers\Projects\hackathon_panaverse\whatsapp_session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/002261.log 
-2026/01/28-00:43:29.391 1f34 Level-0 table #2268: started
-2026/01/28-00:43:29.415 1f34 Level-0 table #2268: 695399 bytes OK
-2026/01/28-00:43:29.416 1f34 Delete type=0 #2261
-2026/01/28-00:43:29.417 1f34 Manual compaction at level-0 from ' \x97\x02\x00\x00\x00' @ 72057594037927935 : 1 .. ' \x98\x02\x00\x00\x00' @ 0 : 0; will stop at (end)
-2026/01/28-00:43:29.472 4e10 Compacting 1@1 + 3@2 files
-2026/01/28-00:43:29.579 4e10 Generated table #2269@1: 55376 keys, 2215469 bytes
-2026/01/28-00:43:29.650 4e10 Generated table #2270@1: 25113 keys, 2189976 bytes
-2026/01/28-00:43:29.697 4e10 Generated table #2271@1: 30549 keys, 967556 bytes
-2026/01/28-00:43:29.698 4e10 Compacted 1@1 + 3@2 files => 5373001 bytes
-2026/01/28-00:43:29.698 4e10 compacted to: files[ 0 0 3 0 0 0 0 ]
-2026/01/28-00:43:29.699 4e10 Delete type=2 #2263
-2026/01/28-00:43:29.699 4e10 Delete type=2 #2264
-2026/01/28-00:43:29.699 4e10 Delete type=2 #2265
-2026/01/28-00:43:29.699 4e10 Delete type=2 #2268
-2026/01/28-00:43:39.197 1f34 Level-0 table #2273: started
-2026/01/28-00:43:39.209 1f34 Level-0 table #2273: 202675 bytes OK
-2026/01/28-00:43:39.210 1f34 Delete type=0 #2267
-2026/01/28-00:43:39.212 1f34 Manual compaction at level-0 from ' \x98\x02\x00\x00\x00' @ 72057594037927935 : 1 .. ' \x99\x02\x00\x00\x00' @ 0 : 0; will stop at (end)
-2026/01/28-00:43:39.284 4e10 Compacting 1@1 + 3@2 files
-2026/01/28-00:43:39.379 4e10 Generated table #2274@1: 55569 keys, 2214268 bytes
-2026/01/28-00:43:39.441 4e10 Generated table #2275@1: 24519 keys, 2189672 bytes
-2026/01/28-00:43:39.486 4e10 Generated table #2276@1: 32309 keys, 1010939 bytes
-2026/01/28-00:43:39.486 4e10 Compacted 1@1 + 3@2 files => 5414879 bytes
-2026/01/28-00:43:39.487 4e10 compacted to: files[ 0 0 3 0 0 0 0 ]
-2026/01/28-00:43:39.487 4e10 Delete type=2 #2269
-2026/01/28-00:43:39.487 4e10 Delete type=2 #2270
-2026/01/28-00:43:39.487 4e10 Delete type=2 #2271
-2026/01/28-00:43:39.487 4e10 Delete type=2 #2273
+2026/01/29-00:00:48.467 1024 Reusing MANIFEST D:\Panavers\Projects\hackathon_panaverse\whatsapp_session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
+2026/01/29-00:00:48.468 1024 Recovering log #1451
+2026/01/29-00:00:48.552 1024 Reusing old log D:\Panavers\Projects\hackathon_panaverse\whatsapp_session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/001451.log 
+2026/01/29-00:00:52.936 3dd4 Manual compaction at level-0 from ' \xa0\x01\x00\x00\x00' @ 72057594037927935 : 1 .. ' \xa1\x01\x00\x00\x00' @ 0 : 0; will stop at (end)
+2026/01/29-00:01:32.739 3dd4 Level-0 table #1463: started
+2026/01/29-00:01:32.889 3dd4 Level-0 table #1463: 1157326 bytes OK
+2026/01/29-00:01:32.895 3dd4 Delete type=0 #1451
+2026/01/29-00:01:33.114 3fa0 Compacting 1@1 + 8@2 files
+2026/01/29-00:01:33.364 3fa0 Generated table #1464@1: 53846 keys, 2215152 bytes
+2026/01/29-00:01:33.695 3fa0 Generated table #1465@1: 27127 keys, 2249504 bytes
+2026/01/29-00:01:33.981 3fa0 Generated table #1466@1: 38332 keys, 2196518 bytes
+2026/01/29-00:01:34.176 3fa0 Generated table #1467@1: 2176 keys, 2155296 bytes
+2026/01/29-00:01:34.311 3fa0 Generated table #1468@1: 8349 keys, 2166600 bytes
+2026/01/29-00:01:34.582 3fa0 Generated table #1469@1: 32956 keys, 2240130 bytes
+2026/01/29-00:01:34.880 3fa0 Generated table #1470@1: 69515 keys, 2211086 bytes
+2026/01/29-00:01:35.058 3fa0 Generated table #1471@1: 41224 keys, 941262 bytes
+2026/01/29-00:01:35.058 3fa0 Compacted 1@1 + 8@2 files => 16375548 bytes
+2026/01/29-00:01:35.060 3fa0 compacted to: files[ 0 0 8 0 0 0 0 ]
+2026/01/29-00:01:35.062 3fa0 Delete type=2 #1453
+2026/01/29-00:01:35.062 3fa0 Delete type=2 #1454
+2026/01/29-00:01:35.062 3fa0 Delete type=2 #1455
+2026/01/29-00:01:35.062 3fa0 Delete type=2 #1456
+2026/01/29-00:01:35.063 3fa0 Delete type=2 #1457
+2026/01/29-00:01:35.063 3fa0 Delete type=2 #1458
+2026/01/29-00:01:35.063 3fa0 Delete type=2 #1459
+2026/01/29-00:01:35.063 3fa0 Delete type=2 #1460
+2026/01/29-00:01:35.063 3fa0 Delete type=2 #1463

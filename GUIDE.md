@@ -12,42 +12,67 @@ WhatsApp has been completely overhauled and is now **100% functional**. See:
 
 ## ⚡ 1. Quick Start Commands (Top Priority)
 
-### Automated Launch (Recommended)
-- Launch all systems: Double-click `start_all.bat`
-- Stop all systems: Double-click `stop_all.bat`
--3. **Restart**: Double-click `start.bat` to launch again.
-4. **Quick Stop**: Double-click `stop.bat` to kill all processes instantly.
+### 🎯 Easiest Way - Double Click Batch Files
+1. **Start Everything**: Double-click `start.bat` in the root folder
+2. **Stop Everything**: Double-click `stop.bat` in the root folder
 
-### ⚡ Power User One-Liner (PowerShell)
-If you prefer a single terminal command to run everything:
+That's it! The batch files will:
+- Start Backend API on port 8000
+- Start Frontend UI on port 3000
+- Open in separate windows so you can see the logs
+
+### 📝 Simple Terminal Commands (If you prefer typing)
+
+**Option 1 - Two separate terminals:**
 ```powershell
-# Start everything
-Start-Process python -ArgumentList "src/api/chat_api.py" -WorkingDirectory $PWD; Start-Process npm -ArgumentList "run dev" -WorkingDirectory "$PWD/frontend"
+# Terminal 1: Start Backend
+cd d:\Panavers\Projects\hackathon_panaverse
+python src/api/chat_api.py
 
-# Stop everything
-taskkill /F /IM python.exe; taskkill /F /IM node.exe
-```
-
-### Interactive Management Menu
-```powershell
-python manage.py
-```
-Use this for specific tasks like seeding data, checking status, or manual component control. Scripts have been moved to the `scripts/` folder.
-
-### Manual Component Launch
-If you need to debug specific parts, run these in separate terminals:
-```powershell
-# Terminal 1: Backend API (FastAPI)
-$env:PYTHONPATH='.'; python src/api/chat_api.py
-
-# Terminal 2: Frontend UI (Next.js)
+# Terminal 2: Start Frontend
+cd d:\Panavers\Projects\hackathon_panaverse
 cd frontend; npm run dev
 
-# Terminal 3: Watchers (Active Monitoring)
+```
+
+**Option 2 - Stop everything:**
+```powershell
+taskkill /F /IM python.exe
+taskkill /F /IM node.exe
+```
+
+### 🔧 Advanced - Run Individual Components
+```powershell
+# Backend API only
+python src/api/chat_api.py
+# check status running
+http://localhost:8000/api/status
+
+# Troubleshooting
+# Kill the old backend
+taskkill /F /IM python.exe
+
+# Wait 2 seconds
+timeout /t 2
+
+# ReStart new backend
+python src/api/chat_api.py
+
+# Frontend only
+cd frontend
+npm run dev
+
+# Watchers (monitors Gmail/WhatsApp)
 python watchers.py
 
-# Terminal 4: Brain Agent (Task Processing)
+# Brain Agent (processes tasks)
 python brain_agent.py
+
+# WhatsApp - First Time Setup (Scan QR Code)
+python tests/verify_whatsapp.py
+
+# WhatsApp - Send Test Message
+python tests/test_wa_send.py
 ```
 
 ---

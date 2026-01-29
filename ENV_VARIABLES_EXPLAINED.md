@@ -101,7 +101,7 @@ LINKEDIN_PASSWORD=your_password_here
 **Purpose**: Power the chatbot and AI summarization
 
 ```bash
-GOOGLE_API_KEY=AIzaSyBHUooUJ2D0ALNx_oVPPYdPO9XCxn5hrMw
+GOOGLE_API_KEY=**************
 OPENAI_API_KEY=your_openai_key_here
 ```
 
@@ -174,12 +174,11 @@ FILTER_KEYWORDS=Panaversity,PIAIC,Panaverse,Quiz,Assignment,Exam,Deadline,Urgent
 **Purpose**: Display contact information on your website/frontend
 
 ```bash
-NEXT_PUBLIC_EMAIL=onlinequran50@gmail.com
-NEXT_PUBLIC_PHONE_UK=+442081239145
+NEXT_PUBLIC_EMAIL=exellencelinks@gmail.com
 NEXT_PUBLIC_PHONE_PK=+923244279017
 NEXT_PUBLIC_WHATSAPP=+46764305834
 NEXT_PUBLIC_FACEBOOK_URL=https://www.facebook.com/profile.php?id=100079966850856
-NEXT_PUBLIC_TEAMS_ID=joinquran1@outlook.com
+NEXT_PUBLIC_EMAIL_ID=khansarwar1@hotmail.com
 ```
 
 **Used by**:
@@ -196,7 +195,7 @@ NEXT_PUBLIC_TEAMS_ID=joinquran1@outlook.com
 **Setup Required**: Optional (only if you want to display contact info on a website)
 
 **Current Status**: 
-- These are currently set to what appears to be **Online Quran teaching contact information**
+- These are currently set to what appears to be **my information**
 - If this project is for Panaversity/PIAIC, you might want to update these to Panaversity contact details
 - If you're not building a public website, these can be ignored
 
