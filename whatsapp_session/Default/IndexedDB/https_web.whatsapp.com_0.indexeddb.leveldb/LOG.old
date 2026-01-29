@@ -1,51 +1,19 @@
-2026/01/28-23:45:37.808 36f0 Reusing MANIFEST D:\Panavers\Projects\hackathon_panaverse\whatsapp_session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
-2026/01/28-23:45:37.809 36f0 Recovering log #1430
-2026/01/28-23:45:37.832 36f0 Reusing old log D:\Panavers\Projects\hackathon_panaverse\whatsapp_session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/001430.log 
-2026/01/28-23:45:40.269 29d0 Level-0 table #1442: started
-2026/01/28-23:45:40.287 29d0 Level-0 table #1442: 405401 bytes OK
-2026/01/28-23:45:40.288 29d0 Delete type=0 #1430
-2026/01/28-23:45:40.289 29d0 Manual compaction at level-0 from ' \x9e\x01\x00\x00\x00' @ 72057594037927935 : 1 .. ' \x9f\x01\x00\x00\x00' @ 0 : 0; will stop at (end)
-2026/01/28-23:45:40.369 36f0 Compacting 1@1 + 8@2 files
-2026/01/28-23:45:40.506 36f0 Generated table #1443@1: 51024 keys, 2212575 bytes
-2026/01/28-23:45:40.624 36f0 Generated table #1444@1: 27459 keys, 2248505 bytes
-2026/01/28-23:45:40.727 36f0 Generated table #1445@1: 37774 keys, 2196503 bytes
-2026/01/28-23:45:40.767 36f0 Generated table #1446@1: 2210 keys, 2154321 bytes
-2026/01/28-23:45:40.828 36f0 Generated table #1447@1: 9299 keys, 2170344 bytes
-2026/01/28-23:45:40.927 36f0 Generated table #1448@1: 32029 keys, 2236490 bytes
-2026/01/28-23:45:41.040 36f0 Generated table #1449@1: 76546 keys, 2220128 bytes
-2026/01/28-23:45:41.062 36f0 Generated table #1450@1: 22886 keys, 530414 bytes
-2026/01/28-23:45:41.062 36f0 Compacted 1@1 + 8@2 files => 15969280 bytes
-2026/01/28-23:45:41.063 36f0 compacted to: files[ 0 0 8 0 0 0 0 ]
-2026/01/28-23:45:41.063 36f0 Delete type=2 #1432
-2026/01/28-23:45:41.063 36f0 Delete type=2 #1433
-2026/01/28-23:45:41.063 36f0 Delete type=2 #1434
-2026/01/28-23:45:41.064 36f0 Delete type=2 #1435
-2026/01/28-23:45:41.064 36f0 Delete type=2 #1436
-2026/01/28-23:45:41.064 36f0 Delete type=2 #1437
-2026/01/28-23:45:41.064 36f0 Delete type=2 #1438
-2026/01/28-23:45:41.064 36f0 Delete type=2 #1439
-2026/01/28-23:45:41.064 36f0 Delete type=2 #1442
-2026/01/28-23:45:49.721 1c6c Level-0 table #1452: started
-2026/01/28-23:45:49.745 1c6c Level-0 table #1452: 187087 bytes OK
-2026/01/28-23:45:49.746 1c6c Delete type=0 #1441
-2026/01/28-23:45:49.747 1c6c Manual compaction at level-0 from ' \x9f\x01\x00\x00\x00' @ 72057594037927935 : 1 .. ' \xa0\x01\x00\x00\x00' @ 0 : 0; will stop at (end)
-2026/01/28-23:45:49.927 36f0 Compacting 1@1 + 8@2 files
-2026/01/28-23:45:50.196 36f0 Generated table #1453@1: 51802 keys, 2211954 bytes
-2026/01/28-23:45:50.526 36f0 Generated table #1454@1: 27352 keys, 2247617 bytes
-2026/01/28-23:45:50.848 36f0 Generated table #1455@1: 37934 keys, 2194869 bytes
-2026/01/28-23:45:50.970 36f0 Generated table #1456@1: 2201 keys, 2153287 bytes
-2026/01/28-23:45:51.124 36f0 Generated table #1457@1: 8982 keys, 2169054 bytes
-2026/01/28-23:45:51.267 36f0 Generated table #1458@1: 32318 keys, 2237901 bytes
-2026/01/28-23:45:51.420 36f0 Generated table #1459@1: 75297 keys, 2218304 bytes
-2026/01/28-23:45:51.463 36f0 Generated table #1460@1: 24506 keys, 568316 bytes
-2026/01/28-23:45:51.463 36f0 Compacted 1@1 + 8@2 files => 16001302 bytes
-2026/01/28-23:45:51.464 36f0 compacted to: files[ 0 0 8 0 0 0 0 ]
-2026/01/28-23:45:51.465 36f0 Delete type=2 #1443
-2026/01/28-23:45:51.465 36f0 Delete type=2 #1444
-2026/01/28-23:45:51.465 36f0 Delete type=2 #1445
-2026/01/28-23:45:51.466 36f0 Delete type=2 #1446
-2026/01/28-23:45:51.466 36f0 Delete type=2 #1447
-2026/01/28-23:45:51.466 36f0 Delete type=2 #1448
-2026/01/28-23:45:51.466 36f0 Delete type=2 #1449
-2026/01/28-23:45:51.466 36f0 Delete type=2 #1450
-2026/01/28-23:45:51.467 36f0 Delete type=2 #1452
+2026/01/29-00:51:13.912 4e2c Reusing MANIFEST D:\Panavers\Projects\hackathon_panaverse\whatsapp_session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
+2026/01/29-00:51:13.914 4e2c Recovering log #2075
+2026/01/29-00:51:13.936 4e2c Reusing old log D:\Panavers\Projects\hackathon_panaverse\whatsapp_session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/002075.log 
+2026/01/29-00:51:17.135 4aac Level-0 table #2083: started
+2026/01/29-00:51:17.151 4aac Level-0 table #2083: 234390 bytes OK
+2026/01/29-00:51:17.152 4aac Delete type=0 #2075
+2026/01/29-00:51:17.155 4e2c Manual compaction at level-0 from ' .\x02\x00\x00\x00' @ 72057594037927935 : 1 .. ' /\x02\x00\x00\x00' @ 0 : 0; will stop at (end)
+2026/01/29-00:51:17.345 4794 Compacting 1@1 + 4@2 files
+2026/01/29-00:51:17.467 4794 Generated table #2084@1: 36000 keys, 2198512 bytes
+2026/01/29-00:51:17.602 4794 Generated table #2085@1: 28638 keys, 2244421 bytes
+2026/01/29-00:51:17.712 4794 Generated table #2086@1: 35118 keys, 2197367 bytes
+2026/01/29-00:51:17.853 4794 Generated table #2087@1: 48520 keys, 2103300 bytes
+2026/01/29-00:51:17.853 4794 Compacted 1@1 + 4@2 files => 8743600 bytes
+2026/01/29-00:51:17.860 4794 compacted to: files[ 0 0 4 0 0 0 0 ]
+2026/01/29-00:51:17.861 4794 Delete type=2 #2077
+2026/01/29-00:51:17.861 4794 Delete type=2 #2078
+2026/01/29-00:51:17.861 4794 Delete type=2 #2079
+2026/01/29-00:51:17.861 4794 Delete type=2 #2080
+2026/01/29-00:51:17.861 4794 Delete type=2 #2083

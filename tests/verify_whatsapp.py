@@ -73,7 +73,14 @@ async def verify_login():
                         print(f"[{(i+1)*10}s] Still waiting... (scan QR if visible)")
             
             if not success:
-                print("\n⚠️ TIMEOUT: Could not verify login.")
+                print("\n[TIMEOUT] Could not verify login.")
+                # Capture screenshot for debugging
+                try:
+                    await page.screenshot(path="login_failed.png")
+                    print("[INFO] Saved screenshot to 'login_failed.png' - please check this image.")
+                except:
+                    pass
+                
                 print("\nPossible reasons:")
                 print("1. QR code wasn't scanned in time")
                 print("2. WhatsApp Web is having connection issues")
@@ -87,7 +94,7 @@ async def verify_login():
             await context.close()
             
     except Exception as e:
-        print(f"\n❌ Error: {e}")
+        print(f"\n[ERROR] {e}")
         print("\nMake sure Playwright is installed:")
         print("  playwright install chromium")
 

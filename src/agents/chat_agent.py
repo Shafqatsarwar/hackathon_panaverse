@@ -100,6 +100,7 @@ Your capabilities and skills (available via tools):
 
 4. **WhatsApp**:
    - Check unread messages (filtered by keywords like Panaversity, PIAIC, etc.)
+   - Can also check **Archived** folders if requested.
    - Tool: `_check_whatsapp_tool`
 
 5. **LinkedIn**:
@@ -187,12 +188,17 @@ Be helpful, concise, and professional. Use emojis sparingly to make responses fr
         if res.get("success"): return f"Lead successfully created! Odoo ID: {res.get('id')}"
         return f"Failed to create lead in Odoo: {res.get('error', 'Unknown error')}"
 
-    def _check_whatsapp_tool(self) -> str:
-        """Check for unread WhatsApp messages matching interest keywords (e.g. Panaversity, PIAIC)."""
+    def _check_whatsapp_tool(self, check_archived: bool = True) -> str:
+        """
+        Check for unread WhatsApp messages matching interest keywords (e.g. Panaversity, PIAIC).
+        
+        Args:
+            check_archived: Whether to also check the Archived folder (Default: True)
+        """
         if not self.whatsapp_agent: return "WhatsApp Agent is not initialized."
         
         try:
-            msgs = self.whatsapp_agent.get_unread_messages()
+            msgs = self.whatsapp_agent.get_unread_messages(check_archived=check_archived)
             if not msgs: return "No new unread messages found matching your Panaversity/PIAIC keywords."
             
             if isinstance(msgs[0], dict) and msgs[0].get("error"):
