@@ -5,7 +5,7 @@ import sys
 import argparse
 import asyncio
 import os
-from src.agents.main_agent import MainAgent
+from agents.main_agent import MainAgent
 
 if os.name == 'nt':
     asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())

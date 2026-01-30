@@ -1,1 +1,1 @@
-from .odoo_skill import OdooSkill
+from .skill import OdooSkill

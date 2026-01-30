@@ -2,7 +2,7 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from src.agents.github_agent import GitHubAgent
+from agents.github_agent import GitHubAgent
 
 def test_github_agent():
     print("Testing GitHub Agent...")

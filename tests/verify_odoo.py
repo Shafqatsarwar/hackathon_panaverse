@@ -2,7 +2,7 @@ import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from src.agents.odoo_agent import OdooAgent
+from agents.odoo_agent import OdooAgent
 
 def test_odoo_agent():
     print("Testing Odoo Agent...")

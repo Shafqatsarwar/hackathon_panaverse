@@ -78,7 +78,7 @@ async def main():
     # Test 5: Import MCP Server
     print_section("Test 5: Import MCP Server")
     try:
-        from src.mcp_servers.whatsapp_server import WhatsAppMCPServer
+        from mcp.whatsapp_server import WhatsAppMCPServer
         print_result("Import WhatsAppMCPServer", True, "Module imported successfully")
     except Exception as e:
         print_result("Import WhatsAppMCPServer", False, f"Error: {e}")
@@ -121,7 +121,7 @@ async def main():
     # Test 9: Import WhatsApp Agent
     print_section("Test 9: Import WhatsApp Agent")
     try:
-        from src.agents.whatsapp_agent import WhatsAppAgent
+        from agents.whatsapp_agent import WhatsAppAgent
         agent = WhatsAppAgent()
         print_result("Import WhatsAppAgent", True, "Agent initialized")
     except Exception as e:

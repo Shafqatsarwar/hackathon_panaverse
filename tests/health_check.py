@@ -32,7 +32,7 @@ except Exception as e:
 # Test 2: ChatAgent (most critical for demo)
 print("\n[2/5] Testing ChatAgent...")
 try:
-    from src.agents.chat_agent import ChatAgent
+    from agents.chat_agent import ChatAgent
     chat_agent = ChatAgent()
     print(f"  [OK] ChatAgent initialized")
     
@@ -49,7 +49,7 @@ except Exception as e:
 # Test 3: MainAgent
 print("\n[3/5] Testing MainAgent...")
 try:
-    from src.agents.main_agent import MainAgent
+    from agents.main_agent import MainAgent
     main_agent = MainAgent()
     print(f"  [OK] MainAgent initialized")
     print(f"  [OK] All sub-agents loaded successfully")

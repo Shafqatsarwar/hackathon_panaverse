@@ -36,49 +36,26 @@ class WhatsAppSkill:
     async def _wait_for_login(self, page: Page) -> bool:
         """
         Waits for the user to be logged in. 
-        Returns True if logged in, False if timeout.
-        Uses multiple fallback selectors for better reliability.
+        Uses a combined selector for efficiency (Playwright OR logic).
         """
         logger.info("WhatsApp Skill: Waiting for login (QR Scan might be needed)...")
         
-        # Multiple selectors to try - WhatsApp UI changes frequently
-        selectors = [
-            '[data-testid="chat-list"]',  # Main chat list
-            '#pane-side',  # Side panel
-            '[data-icon="new-chat-outline"]',  # New chat button
-            'div[role="application"]',  # Main app container
-            'header[data-testid="chatlist-header"]',  # Chat list header
-            'div[aria-label*="Chat list"]',  # Chat list aria label
-            'button[aria-label*="New chat"]',  # New chat button
-            'div._3OvU8',  # WhatsApp main panel class (may change)
-        ]
+        # Combined selector: Check for Chat List OR Pane Side OR New Chat Button
+        # This matches verify_whatsapp.py logic which was successful
+        login_selector = '#pane-side, [data-testid="chat-list"], div[aria-label="Chat list"], canvas'
         
         try:
-            # Try each selector with a shorter timeout
-            for i, selector in enumerate(selectors):
-                try:
-                    logger.info(f"WhatsApp Skill: Trying selector {i+1}/{len(selectors)}: {selector[:50]}...")
-                    # Increased to 60 seconds per selector as requested
-                    await page.wait_for_selector(selector, timeout=60000, state='visible')
-                    logger.info(f"WhatsApp Skill: Login detected successfully using selector: {selector[:50]}")
-                    return True
-                except Exception:
-                    continue  # Try next selector
-            
-            # If all selectors failed, try one more time with a combined selector
-            logger.info("WhatsApp Skill: Trying combined selector as final attempt...")
-            combined_selector = ', '.join(selectors[:5])
-            await page.wait_for_selector(combined_selector, timeout=60000)
-            logger.info("WhatsApp Skill: Login detected successfully with combined selector")
+            logger.info(f"WhatsApp Skill: Checking login with robust selector...")
+            # Wait up to 60s
+            await page.wait_for_selector(login_selector, timeout=60000, state='visible')
+            logger.info("WhatsApp Skill: Login detected successfully!")
             return True
             
         except Exception as e:
-            logger.error(f"WhatsApp Skill: Login timeout after trying all selectors: {e}")
-            # Take screenshot for debugging
+            logger.warning(f"WhatsApp Skill: Login check timed out or failed: {e}")
             try:
-                await page.screenshot(path="whatsapp_login_timeout.png")
-                logger.info("WhatsApp Skill: Screenshot saved to whatsapp_login_timeout.png")
-            except:
+                await page.screenshot(path="whatsapp_login_fail.png")
+            except: 
                 pass
             return False
 
@@ -276,17 +253,17 @@ class WhatsAppSkill:
         keywords: List[str] = None, 
         check_archived: bool = True, 
         limit: int = 20
-    ) -> List[Dict[str, Any]]:
+    ) -> Dict[str, Any]:
         """
         Check WhatsApp messages (async version).
         Robust Archived folder logic using text-based locators.
         """
         if not self.enabled:
-            return [{"error": "WhatsApp skill is disabled"}]
+            return {"success": False, "error": "WhatsApp skill is disabled", "messages": []}
         
         page = await self._init_browser()
         if not page:
-            return [{"error": "Failed to initialize browser or login"}]
+            return {"success": False, "error": "Failed to initialize browser or login", "messages": []}
         
         messages_found = []
         
@@ -377,11 +354,11 @@ class WhatsAppSkill:
             main_chats = await parse_chats()
             messages_found.extend(main_chats)
             
-            return messages_found
+            return {"success": True, "messages": messages_found, "count": len(messages_found)}
             
         except Exception as e:
             logger.error(f"WhatsApp Scan Error: {e}")
-            return [{"error": str(e)}]
+            return {"success": False, "error": str(e), "messages": []}
         finally:
             await self._cleanup()
 

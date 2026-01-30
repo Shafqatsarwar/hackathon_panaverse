@@ -3,7 +3,7 @@ import os
 import asyncio
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from src.agents.chat_agent import ChatAgent
+from agents.chat_agent import ChatAgent
 
 async def test_chat_agent():
     print("Testing Chat Agent...")

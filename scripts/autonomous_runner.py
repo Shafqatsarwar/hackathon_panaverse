@@ -6,7 +6,7 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 
 # Import Agents and Skills
-from src.agents.main_agent import MainAgent
+from agents.main_agent import MainAgent
 from skills.whatsapp_skill.skill import WhatsAppSkill
 from skills.gmail_monitoring.gmail_monitoring import GmailMonitoringSkill
 from src.utils.config import Config

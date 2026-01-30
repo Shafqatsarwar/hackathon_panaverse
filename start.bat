@@ -23,25 +23,22 @@ if exist ".venv\Scripts\python.exe" (
     echo [INFO] Using System Python
 )
 
-:: 3. Check Frontend Dependencies
-if not exist "frontend\node_modules" (
-    echo [SETUP] Installing Frontend Dependencies...
-    cd frontend
-    call npm install
-    cd ..
-)
+:: 3. Start Odoo MCP Server (Optional background)
+:: echo [START] Launching Odoo MCP Server...
+:: start /B "Odoo MCP" %PYTHON_EXE% mcp/odoo_server.py
 
-:: 4. Start Backend in new window
+:: 4. Start Backend
 echo [START] Launching Backend API (Port 8000)...
-start "Backend API - Port 8000" cmd /k "%PYTHON_EXE% src\api\chat_api.py"
+start "Backend API" cmd /k "%PYTHON_EXE% src/api/chat_api.py"
 
-:: Wait a bit for backend to start
-timeout /t 3 >nul
+:: Wait for backend
+timeout /t 5 >nul
 
-:: 5. Start Frontend in new window
+:: 5. Start Frontend
 echo [START] Launching Frontend UI (Port 3000)...
 cd frontend
-start "Frontend UI - Port 3000" cmd /k "npm run dev"
+if not exist "node_modules" call npm install
+start "Frontend UI" cmd /k "npm run dev"
 cd ..
 
 echo.
@@ -51,8 +48,11 @@ echo.
 echo Backend:  http://localhost:8000/api/status
 echo Frontend: http://localhost:3000
 echo.
-echo Two windows have opened - check them for logs.
-echo Use 'stop.bat' to stop everything.
+echo Two windows have opened. Don't close them!
+echo Press any key to stop everything.
 echo ========================================================
-echo.
 pause
+
+taskkill /F /IM python.exe /T 2>nul
+taskkill /F /IM node.exe /T 2>nul
+echo [STOPPED]

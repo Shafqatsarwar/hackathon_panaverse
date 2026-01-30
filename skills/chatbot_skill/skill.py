@@ -128,7 +128,7 @@ class ChatbotSkill:
                     if match:
                         wait_time = float(match.group(1)) + 1
                         
-                    yield f" [Rate limit hit, retrying in {int(wait_time)}s...] "
+                    logger.warning(f"Rate limit hit, retrying in {wait_time}s...")
                     time.sleep(wait_time)
                 else:
                     error_msg = str(e) or type(e).__name__

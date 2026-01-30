@@ -34,8 +34,8 @@ logger = logging.getLogger(__name__)
 #    asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
 # nest_asyncio.apply()
 
-from src.agents.chat_agent import ChatAgent
-from src.agents.main_agent import MainAgent
+from agents.chat_agent import ChatAgent
+from agents.main_agent import MainAgent
 
 
 # Initialize FastAPI app

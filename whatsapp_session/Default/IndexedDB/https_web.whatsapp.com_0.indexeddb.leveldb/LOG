@@ -1,21 +1,39 @@
-2026/01/29-01:38:24.045 2adc Reusing MANIFEST D:\Panavers\Projects\hackathon_panaverse\whatsapp_session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
-2026/01/29-01:38:24.046 2adc Recovering log #2151
-2026/01/29-01:38:24.217 2adc Reusing old log D:\Panavers\Projects\hackathon_panaverse\whatsapp_session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/002151.log 
-2026/01/29-01:38:26.582 2adc Level-0 table #2160: started
-2026/01/29-01:38:26.656 2adc Level-0 table #2160: 513171 bytes OK
-2026/01/29-01:38:26.659 2adc Delete type=0 #2151
-2026/01/29-01:38:26.664 4c78 Manual compaction at level-0 from ' 9\x02\x00\x00\x00' @ 72057594037927935 : 1 .. ' :\x02\x00\x00\x00' @ 0 : 0; will stop at (end)
-2026/01/29-01:38:26.892 3724 Compacting 1@1 + 5@2 files
-2026/01/29-01:38:27.542 3724 Generated table #2161@1: 46822 keys, 2217671 bytes
-2026/01/29-01:38:27.842 3724 Generated table #2162@1: 27502 keys, 2248123 bytes
-2026/01/29-01:38:28.080 3724 Generated table #2163@1: 37477 keys, 2199117 bytes
-2026/01/29-01:38:28.246 3724 Generated table #2164@1: 32993 keys, 2188404 bytes
-2026/01/29-01:38:28.292 3724 Generated table #2165@1: 16879 keys, 401276 bytes
-2026/01/29-01:38:28.293 3724 Compacted 1@1 + 5@2 files => 9254591 bytes
-2026/01/29-01:38:28.294 3724 compacted to: files[ 0 0 5 0 0 0 0 ]
-2026/01/29-01:38:28.294 3724 Delete type=2 #2153
-2026/01/29-01:38:28.294 3724 Delete type=2 #2154
-2026/01/29-01:38:28.295 3724 Delete type=2 #2155
-2026/01/29-01:38:28.295 3724 Delete type=2 #2156
-2026/01/29-01:38:28.295 3724 Delete type=2 #2157
-2026/01/29-01:38:28.295 3724 Delete type=2 #2160
+2026/01/30-00:28:09.184 aac Reusing MANIFEST D:\Panavers\Projects\hackathon_panaverse\whatsapp_session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
+2026/01/30-00:28:09.185 aac Recovering log #2757
+2026/01/30-00:28:09.210 aac Reusing old log D:\Panavers\Projects\hackathon_panaverse\whatsapp_session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/002757.log 
+2026/01/30-00:28:11.217 aac Level-0 table #2766: started
+2026/01/30-00:28:11.234 aac Level-0 table #2766: 334997 bytes OK
+2026/01/30-00:28:11.236 aac Delete type=0 #2757
+2026/01/30-00:28:11.237 aac Manual compaction at level-0 from ' \xa7\x02\x00\x00\x00' @ 72057594037927935 : 1 .. ' \xa8\x02\x00\x00\x00' @ 0 : 0; will stop at (end)
+2026/01/30-00:28:11.316 f2c Compacting 1@1 + 5@2 files
+2026/01/30-00:28:11.569 f2c Generated table #2767@1: 57351 keys, 2220297 bytes
+2026/01/30-00:28:11.688 f2c Generated table #2768@1: 25602 keys, 2239069 bytes
+2026/01/30-00:28:11.830 f2c Generated table #2769@1: 39687 keys, 2208720 bytes
+2026/01/30-00:28:11.913 f2c Generated table #2770@1: 17975 keys, 2174099 bytes
+2026/01/30-00:28:12.023 f2c Generated table #2771@1: 67970 keys, 1649402 bytes
+2026/01/30-00:28:12.023 f2c Compacted 1@1 + 5@2 files => 10491587 bytes
+2026/01/30-00:28:12.024 f2c compacted to: files[ 0 0 5 0 0 0 0 ]
+2026/01/30-00:28:12.025 f2c Delete type=2 #2759
+2026/01/30-00:28:12.025 f2c Delete type=2 #2760
+2026/01/30-00:28:12.025 f2c Delete type=2 #2761
+2026/01/30-00:28:12.025 f2c Delete type=2 #2762
+2026/01/30-00:28:12.025 f2c Delete type=2 #2763
+2026/01/30-00:28:12.026 f2c Delete type=2 #2766
+2026/01/30-00:28:18.582 aac Level-0 table #2773: started
+2026/01/30-00:28:18.600 aac Level-0 table #2773: 219071 bytes OK
+2026/01/30-00:28:18.605 aac Delete type=0 #2765
+2026/01/30-00:28:18.606 aac Manual compaction at level-0 from ' \xa8\x02\x00\x00\x00' @ 72057594037927935 : 1 .. ' \xa9\x02\x00\x00\x00' @ 0 : 0; will stop at (end)
+2026/01/30-00:28:18.780 f2c Compacting 1@1 + 5@2 files
+2026/01/30-00:28:18.964 f2c Generated table #2774@1: 58365 keys, 2220414 bytes
+2026/01/30-00:28:19.214 f2c Generated table #2775@1: 25474 keys, 2238388 bytes
+2026/01/30-00:28:19.353 f2c Generated table #2776@1: 39480 keys, 2208937 bytes
+2026/01/30-00:28:19.472 f2c Generated table #2777@1: 18328 keys, 2174000 bytes
+2026/01/30-00:28:19.572 f2c Generated table #2778@1: 68064 keys, 1673704 bytes
+2026/01/30-00:28:19.572 f2c Compacted 1@1 + 5@2 files => 10515443 bytes
+2026/01/30-00:28:19.575 f2c compacted to: files[ 0 0 5 0 0 0 0 ]
+2026/01/30-00:28:19.576 f2c Delete type=2 #2767
+2026/01/30-00:28:19.576 f2c Delete type=2 #2768
+2026/01/30-00:28:19.576 f2c Delete type=2 #2769
+2026/01/30-00:28:19.576 f2c Delete type=2 #2770
+2026/01/30-00:28:19.576 f2c Delete type=2 #2771
+2026/01/30-00:28:19.576 f2c Delete type=2 #2773

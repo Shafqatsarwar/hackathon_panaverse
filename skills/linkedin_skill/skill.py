@@ -11,6 +11,7 @@ import time
 from typing import Dict, Any, List, Optional
 import nest_asyncio
 from playwright.async_api import async_playwright, Page, BrowserContext, Playwright
+from src.utils.config import Config
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +31,7 @@ class LinkedInSkill:
         try:
             # Wait for global nav or feed
             # #global-nav is standard
-            await page.wait_for_selector('#global-nav', timeout=60000)
+            await page.wait_for_selector('#global-nav', timeout=15000) # Reduced timeout for faster check
             return True
         except:
             return False
@@ -64,10 +65,25 @@ class LinkedInSkill:
                 await page.goto("https://www.linkedin.com/feed/", wait_until="domcontentloaded")
             
             if not await self._wait_for_login(page):
-                logger.error("LinkedIn Skill: Not logged in. Please log in manually.")
-                await context.close()
-                await playwright.stop()
-                return {"error": "Login required"}
+                logger.info("LinkedIn Skill: Session invalid. Attempting autonomous login...")
+                try:
+                    # Navigate to login if not there
+                    if "login" not in page.url and "checkpoint" not in page.url:
+                        await page.goto("https://www.linkedin.com/login", wait_until="domcontentloaded")
+                    
+                    await page.fill('#username', Config.LINKEDIN_EMAIL)
+                    await page.fill('#password', Config.LINKEDIN_PASSWORD)
+                    await page.click('button[type="submit"]')
+                    
+                    # Wait for feed
+                    await page.wait_for_selector('#global-nav', timeout=30000)
+                    logger.info("LinkedIn Skill: Autonomous login successful!")
+                    
+                except Exception as e:
+                    logger.error(f"LinkedIn Skill: Autonomous login failed: {e}")
+                    await context.close()
+                    await playwright.stop()
+                    return {"success": False, "error": "Login failed (Manual refresh required)"}
 
             # 2. Get Notifications
             logger.info("LinkedIn Skill: Checking notifications...")
@@ -87,7 +103,6 @@ class LinkedInSkill:
                 await page.goto("https://www.linkedin.com/messaging/", wait_until="domcontentloaded")
                 try:
                     # Wait for message list
-                    # .msg-conversation-card__content--selectable is a common selector class
                     await page.wait_for_selector('div[class*="msg-conversation-card"]', timeout=10000)
                     
                     conversations = await page.locator('div[class*="msg-conversation-card"]').all()
@@ -113,13 +128,14 @@ class LinkedInSkill:
 
             await context.close()
             await playwright.stop()
+            results["success"] = True
             return results
 
         except Exception as e:
             logger.error(f"LinkedIn Playwright Error: {e}")
             if context: await context.close()
             if playwright: await playwright.stop()
-            return {"error": str(e)}
+            return {"success": False, "error": str(e)}
 
     def _run_async_safe(self, coro):
         """Helper to run async code safely on Windows"""
@@ -155,10 +171,110 @@ class LinkedInSkill:
 
     def scrape_leads(self) -> Dict[str, Any]:
         """Scrape notifications and messages"""
-        if not self.enabled: return {"error": "Disabled"}
+        if not self.enabled: return {"success": False, "error": "LinkedIn integration is disabled"}
         return self._run_async_safe(self._scrape_data(scan_messages=True))
 
     def check_notifications(self) -> Dict[str, Any]:
         """Check notifications only"""
         # Kept for backward compatibility
         return self.scrape_leads()
+
+    async def _post_update_async(self, content: str) -> Dict[str, Any]:
+        """Post an update to LinkedIn (Async)"""
+        playwright: Optional[Playwright] = None
+        context: Optional[BrowserContext] = None
+        
+        try:
+            playwright = await async_playwright().start()
+            context = await playwright.chromium.launch_persistent_context(
+                user_data_dir=self.session_dir,
+                headless=self.headless,
+                args=[
+                    "--disable-blink-features=AutomationControlled",
+                    "--no-sandbox",
+                    "--disable-infobars",
+                    "--window-size=1280,800"
+                ],
+                user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+            )
+            
+            page = context.pages[0] if context.pages else await context.new_page()
+            
+            # 1. Login Check (with auto-login fallback)
+            logger.info("LinkedIn Skill: Checking login...")
+            if "linkedin.com/feed" not in page.url:
+                await page.goto("https://www.linkedin.com/feed/", wait_until="domcontentloaded")
+            
+            if not await self._wait_for_login(page):
+                logger.info("LinkedIn Skill: Session invalid. Attempting autonomous login...")
+                try:
+                    if "login" not in page.url and "checkpoint" not in page.url:
+                        await page.goto("https://www.linkedin.com/login", wait_until="domcontentloaded")
+                    
+                    await page.fill('#username', Config.LINKEDIN_EMAIL)
+                    await page.fill('#password', Config.LINKEDIN_PASSWORD)
+                    await page.click('button[type="submit"]')
+                    await page.wait_for_selector('#global-nav', timeout=30000)
+                    logger.info("LinkedIn Skill: Autonomous login successful!")
+                except Exception as e:
+                    logger.error(f"LinkedIn Skill: Autonomous login failed during post: {e}")
+                    await context.close()
+                    await playwright.stop()
+                    return {"success": False, "error": "Login failed"}
+
+            # 2. Click Start a Post
+            logger.info("LinkedIn Skill: Clicking 'Start a post'...")
+            start_post_selectors = [
+                'button.share-box-feed-entry__trigger',
+                'button[aria-label="Start a post"]',
+                'div.share-box-feed-entry__top-bar button' 
+            ]
+            
+            clicked = False
+            for sel in start_post_selectors:
+                if await page.locator(sel).count() > 0:
+                    await page.locator(sel).first.click()
+                    clicked = True
+                    break
+            
+            if not clicked:
+                try:
+                    await page.get_by_text("Start a post").click()
+                    clicked = True
+                except: pass
+                
+            if not clicked:
+                return {"success": False, "error": "Could not find 'Start a post' button"}
+
+            # 3. Type Content
+            logger.info("LinkedIn Skill: Typing content...")
+            await page.wait_for_selector('.share-creation-state__text-editor .ql-editor', timeout=10000)
+            editor = page.locator('.share-creation-state__text-editor .ql-editor').first
+            await editor.click()
+            await editor.fill(content)
+            await page.wait_for_timeout(1000)
+
+            # 4. Click Post
+            logger.info("LinkedIn Skill: Clicking 'Post'...")
+            post_btn = page.locator('button.share-actions__primary-action')
+            if await post_btn.count() == 0:
+                # Fallback selector
+                post_btn = page.get_by_text("Post", exact=True).nth(-1)
+            
+            await post_btn.click()
+            await page.wait_for_timeout(3000)
+            
+            await context.close()
+            await playwright.stop()
+            return {"success": True}
+
+        except Exception as e:
+            logger.error(f"LinkedIn Post Error: {e}")
+            if context: await context.close()
+            if playwright: await playwright.stop()
+            return {"success": False, "error": str(e)}
+
+    def post_update(self, content: str) -> Dict[str, Any]:
+        """Post an update (Sync wrapper)"""
+        if not self.enabled: return {"success": False, "error": "LinkedIn integration is disabled"}
+        return self._run_async_safe(self._post_update_async(content))
