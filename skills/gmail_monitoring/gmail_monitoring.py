@@ -166,8 +166,14 @@ class GmailMonitoringSkill:
         logger.info(f"Found {len(relevant_emails)} relevant emails")
         return relevant_emails
     
-    def check_emails(self) -> List[Dict[str, Any]]:
-        """Main method to check for new relevant emails"""
+    def check_emails(self, mark_read: bool = False) -> List[Dict[str, Any]]:
+        """
+        Main method to check for new relevant emails.
+        
+        Args:
+            mark_read: If True, marks fetched emails as read to prevent re-processing.
+                       Defaults to False (safe mode).
+        """
         logger.info("Checking for new emails...")
         
         emails = self.fetch_unread_emails()
@@ -178,4 +184,35 @@ class GmailMonitoringSkill:
         relevant_emails = self.filter_relevant_emails(emails)
         self.last_check_time = datetime.now()
         
+        # Optional: Mark as read if requested
+        if mark_read and self.service:
+            try:
+                batch = self.service.new_batch_http_request()
+                for email in emails: # Mark ALL fetched unread emails as read, or just relevant?
+                    # Usually better to mark all as read so we don't get stuck on irrelevant spam,
+                    # BUT that might be dangerous if the user misses non-relevant but personal emails.
+                    # Safest: Mark ONLY relevant emails as read.
+                    if email in relevant_emails:
+                         self.service.users().messages().modify(
+                            userId='me',
+                            id=email['id'],
+                            body={'removeLabelIds': ['UNREAD']}
+                        ).execute()
+            except Exception as e:
+                logger.error(f"Failed to mark emails as read: {e}")
+
         return relevant_emails
+
+    def mark_email_as_read(self, msg_id: str) -> bool:
+        """Mark a single email as read"""
+        try:
+             self.service.users().messages().modify(
+                userId='me',
+                id=msg_id,
+                body={'removeLabelIds': ['UNREAD']}
+            ).execute()
+             return True
+        except Exception as e:
+            logger.error(f"Failed to mark email {msg_id} as read: {e}")
+            return False
+

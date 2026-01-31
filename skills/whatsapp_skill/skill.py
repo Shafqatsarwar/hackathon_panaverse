@@ -73,14 +73,14 @@ class WhatsAppSkill:
                     "--disable-setuid-sandbox",
                     "--disable-infobars",
                     "--window-size=1280,800"
-                ],
-                user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+                ]
+                # user_agent removed to match verify_whatsapp.py default
             )
             
             page = self._context.pages[0] if self._context.pages else await self._context.new_page()
             
             if "web.whatsapp.com" not in page.url:
-                # Increased timeout to 60 seconds for slow connections
+                # Increased timeout to 60 seconds
                 await page.goto("https://web.whatsapp.com", wait_until="domcontentloaded", timeout=60000)
             
             if not await self._wait_for_login(page):

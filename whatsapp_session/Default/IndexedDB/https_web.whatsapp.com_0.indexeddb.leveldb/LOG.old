@@ -1,39 +1,23 @@
-2026/01/30-00:19:02.571 5700 Reusing MANIFEST D:\Panavers\Projects\hackathon_panaverse\whatsapp_session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
-2026/01/30-00:19:02.572 5700 Recovering log #2742
-2026/01/30-00:19:02.602 5700 Reusing old log D:\Panavers\Projects\hackathon_panaverse\whatsapp_session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/002742.log 
-2026/01/30-00:19:04.400 140c Level-0 table #2751: started
-2026/01/30-00:19:04.416 140c Level-0 table #2751: 316804 bytes OK
-2026/01/30-00:19:04.417 140c Delete type=0 #2742
-2026/01/30-00:19:04.419 140c Manual compaction at level-0 from ' \xa5\x02\x00\x00\x00' @ 72057594037927935 : 1 .. ' \xa6\x02\x00\x00\x00' @ 0 : 0; will stop at (end)
-2026/01/30-00:19:04.512 5700 Compacting 1@1 + 5@2 files
-2026/01/30-00:19:04.668 5700 Generated table #2752@1: 54693 keys, 2214577 bytes
-2026/01/30-00:19:04.808 5700 Generated table #2753@1: 25892 keys, 2241660 bytes
-2026/01/30-00:19:04.948 5700 Generated table #2754@1: 39244 keys, 2203665 bytes
-2026/01/30-00:19:05.015 5700 Generated table #2755@1: 18024 keys, 2174791 bytes
-2026/01/30-00:19:05.122 5700 Generated table #2756@1: 67768 keys, 1593760 bytes
-2026/01/30-00:19:05.122 5700 Compacted 1@1 + 5@2 files => 10428453 bytes
-2026/01/30-00:19:05.123 5700 compacted to: files[ 0 0 5 0 0 0 0 ]
-2026/01/30-00:19:05.124 5700 Delete type=2 #2744
-2026/01/30-00:19:05.124 5700 Delete type=2 #2745
-2026/01/30-00:19:05.124 5700 Delete type=2 #2746
-2026/01/30-00:19:05.124 5700 Delete type=2 #2747
-2026/01/30-00:19:05.124 5700 Delete type=2 #2748
-2026/01/30-00:19:05.124 5700 Delete type=2 #2751
-2026/01/30-00:19:11.445 140c Level-0 table #2758: started
-2026/01/30-00:19:11.485 140c Level-0 table #2758: 247560 bytes OK
-2026/01/30-00:19:11.487 140c Delete type=0 #2750
-2026/01/30-00:19:11.493 35ec Manual compaction at level-0 from ' \xa6\x02\x00\x00\x00' @ 72057594037927935 : 1 .. ' \xa7\x02\x00\x00\x00' @ 0 : 0; will stop at (end)
-2026/01/30-00:19:11.603 5700 Compacting 1@1 + 5@2 files
-2026/01/30-00:19:11.766 5700 Generated table #2759@1: 55892 keys, 2215664 bytes
-2026/01/30-00:19:11.912 5700 Generated table #2760@1: 25797 keys, 2240792 bytes
-2026/01/30-00:19:12.065 5700 Generated table #2761@1: 39391 keys, 2206572 bytes
-2026/01/30-00:19:12.141 5700 Generated table #2762@1: 18040 keys, 2172489 bytes
-2026/01/30-00:19:12.282 5700 Generated table #2763@1: 67780 keys, 1611357 bytes
-2026/01/30-00:19:12.282 5700 Compacted 1@1 + 5@2 files => 10446874 bytes
-2026/01/30-00:19:12.282 5700 compacted to: files[ 0 0 5 0 0 0 0 ]
-2026/01/30-00:19:12.283 5700 Delete type=2 #2752
-2026/01/30-00:19:12.283 5700 Delete type=2 #2753
-2026/01/30-00:19:12.283 5700 Delete type=2 #2754
-2026/01/30-00:19:12.283 5700 Delete type=2 #2755
-2026/01/30-00:19:12.283 5700 Delete type=2 #2756
-2026/01/30-00:19:12.284 5700 Delete type=2 #2758
+2026/01/31-00:56:17.002 5790 Reusing MANIFEST D:\Panavers\Projects\hackathon_panaverse\whatsapp_session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
+2026/01/31-00:56:17.011 5790 Recovering log #3837
+2026/01/31-00:56:17.075 5790 Reusing old log D:\Panavers\Projects\hackathon_panaverse\whatsapp_session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/003837.log 
+2026/01/31-00:56:18.777 4f40 Level-0 table #3847: started
+2026/01/31-00:56:18.799 4f40 Level-0 table #3847: 574442 bytes OK
+2026/01/31-00:56:18.800 4f40 Delete type=0 #3837
+2026/01/31-00:56:18.800 4f40 Manual compaction at level-0 from ' \x7f\x03\x00\x00\x00' @ 72057594037927935 : 1 .. ' \x80\x03\x00\x00\x00' @ 0 : 0; will stop at (end)
+2026/01/31-00:56:18.879 5790 Compacting 1@1 + 6@2 files
+2026/01/31-00:56:19.008 5790 Generated table #3848@1: 83319 keys, 2231660 bytes
+2026/01/31-00:56:19.090 5790 Generated table #3849@1: 34670 keys, 2220379 bytes
+2026/01/31-00:56:19.170 5790 Generated table #3850@1: 27933 keys, 2189286 bytes
+2026/01/31-00:56:19.231 5790 Generated table #3851@1: 19301 keys, 2156907 bytes
+2026/01/31-00:56:19.389 5790 Generated table #3852@1: 117119 keys, 2271364 bytes
+2026/01/31-00:56:19.457 5790 Generated table #3853@1: 46963 keys, 908669 bytes
+2026/01/31-00:56:19.457 5790 Compacted 1@1 + 6@2 files => 11978265 bytes
+2026/01/31-00:56:19.457 5790 compacted to: files[ 0 0 6 0 0 0 0 ]
+2026/01/31-00:56:19.458 5790 Delete type=2 #3839
+2026/01/31-00:56:19.458 5790 Delete type=2 #3840
+2026/01/31-00:56:19.458 5790 Delete type=2 #3841
+2026/01/31-00:56:19.458 5790 Delete type=2 #3842
+2026/01/31-00:56:19.458 5790 Delete type=2 #3843
+2026/01/31-00:56:19.459 5790 Delete type=2 #3844
+2026/01/31-00:56:19.459 5790 Delete type=2 #3847

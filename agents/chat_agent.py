@@ -133,7 +133,7 @@ When users ask about:
 
 Be helpful, concise, and professional. Use emojis sparingly to make responses friendly."""
     
-    def _check_email_tool(self, query: str = "") -> str:
+    def _check_email_tool(self, query: str = "", **kwargs) -> str:
         """
         Check for new important emails in the user's inbox.
         
@@ -156,7 +156,7 @@ Be helpful, concise, and professional. Use emojis sparingly to make responses fr
             logger.error(f"Email tool error: {e}")
             return f"Failed to check emails: {str(e) or 'Unknown error'}"
     
-    def _send_email_tool(self, to_email: str, subject: str, body: str) -> str:
+    def _send_email_tool(self, to_email: str, subject: str, body: str, **kwargs) -> str:
         """
         Send an email to a specified recipient.
         
@@ -183,39 +183,55 @@ Be helpful, concise, and professional. Use emojis sparingly to make responses fr
             logger.error(f"Send email tool error: {e}")
             return f"Failed to send email: {str(e)}"
 
-    def _create_lead_tool(self, name: str, description: str, email: str = "unknown@example.com") -> str:
+    def _create_lead_tool(self, name: str, description: str, email: str = "unknown@example.com", **kwargs) -> str:
         """Create a new lead or opportunity in Odoo CRM."""
         if not self.odoo_agent.enabled: return "Odoo integration is currently disabled."
         res = self.odoo_agent.create_lead(name, email, description)
         if res.get("success"): return f"Lead successfully created! Odoo ID: {res.get('id')}"
         return f"Failed to create lead in Odoo: {res.get('error', 'Unknown error')}"
 
-    def _check_whatsapp_tool(self, check_archived: bool = True) -> str:
+    def _check_whatsapp_tool(self, query: str = "", check_archived: bool = True, limit: int = 10, **kwargs) -> str:
         """
         Check for unread WhatsApp messages matching interest keywords (e.g. Panaversity, PIAIC).
         
         Args:
-            check_archived: Whether to also check the Archived folder (Default: True)
+            query: Optional search query or reason (used for context, but filtering uses Config keywords).
+            check_archived: Whether to also check the Archived folder (Default: True). Set to False if user says "excluding archives".
+            limit: Number of messages to retrieve (Default: 10)
         """
         if not self.whatsapp_agent: return "WhatsApp Agent is not initialized."
         
         try:
-            msgs = self.whatsapp_agent.get_unread_messages(check_archived=check_archived)
-            if not msgs: return "No new unread messages found matching your Panaversity/PIAIC keywords."
+            # WhatsAppAgent returns a dict with 'messages' list, or a list (legacy), or dict with error
+            res = self.whatsapp_agent.get_unread_messages(limit=limit, check_archived=check_archived)
             
-            if isinstance(msgs[0], dict) and msgs[0].get("error"):
-                return f"WhatsApp check failed: {msgs[0].get('error')}"
-                
+            msgs = []
+            if isinstance(res, dict):
+                if res.get("error"):
+                    return f"WhatsApp check failed: {res.get('error')}"
+                msgs = res.get("messages", [])
+            elif isinstance(res, list):
+                msgs = res
+            
+            if not msgs: return f"No new unread messages found matching your Panaversity/PIAIC keywords (Archived={check_archived})."
+            
             summary = "Found unread WhatsApp messages:\n"
             for msg in msgs:
-                summary += f"- {msg.get('sender', 'Unknown')}: {msg.get('content', '')[:100]}\n"
+                sender = msg.get('sender') or msg.get('title') or 'Unknown'
+                content = msg.get('content') or msg.get('last_message') or ''
+                summary += f"- {sender}: {content[:100]}\n"
             return summary
         except Exception as e:
             logger.error(f"WhatsApp tool error: {e}")
             return f"Error accessing WhatsApp: {str(e) or type(e).__name__}"
 
-    def _check_linkedin_tool(self) -> str:
-        """Check for latest LinkedIn notifications and connection requests."""
+    def _check_linkedin_tool(self, query: str = "", **kwargs) -> str:
+        """
+        Check for latest LinkedIn notifications and connection requests.
+        
+        Args:
+            query: Optional reason for checking.
+        """
         if not self.linkedin_agent: return "LinkedIn Agent is not active."
         
         try:
@@ -235,7 +251,7 @@ Be helpful, concise, and professional. Use emojis sparingly to make responses fr
             return f"Error accessing LinkedIn: {str(e) or type(e).__name__}"
 
     
-    def _send_whatsapp_tool(self, to_number: str, message: str) -> str:
+    def _send_whatsapp_tool(self, to_number: str, message: str, **kwargs) -> str:
         """
         Send a WhatsApp message.
         Args:
@@ -252,7 +268,7 @@ Be helpful, concise, and professional. Use emojis sparingly to make responses fr
         except Exception as e:
             return f"Error sending WhatsApp: {e}"
 
-    def _post_linkedin_tool(self, content: str) -> str:
+    def _post_linkedin_tool(self, content: str, **kwargs) -> str:
         """
         Post a new update/status to LinkedIn.
         Args:
@@ -268,7 +284,7 @@ Be helpful, concise, and professional. Use emojis sparingly to make responses fr
         except Exception as e:
             return f"Error posting to LinkedIn: {e}"
 
-    def _get_leads_tool(self, limit: int = 5) -> str:
+    def _get_leads_tool(self, limit: int = 5, **kwargs) -> str:
         """Get a list of the most recent leads from Odoo CRM."""
         if not self.odoo_agent.enabled: return "Odoo integration is disabled."
         try:

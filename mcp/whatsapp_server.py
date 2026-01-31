@@ -16,10 +16,13 @@ class WhatsAppMCPServer:
     def __init__(self):
         self.name = "whatsapp"
         self.version = "2.0.0"
-        # Initialize the actual WhatsApp skill
+        session_path = os.path.abspath("./whatsapp_session")
+        logger.info(f"MCP Server: Using WhatsApp Session at {session_path}")
+        
         self.skill = WhatsAppSkill(
             enabled=Config.WHATSAPP_ENABLED,
-            headless=True  # Run headless in production
+            headless=False,  # Force Headed to match persisted session type
+            session_dir=session_path
         )
         
     def list_tools(self) -> List[Dict[str, Any]]:

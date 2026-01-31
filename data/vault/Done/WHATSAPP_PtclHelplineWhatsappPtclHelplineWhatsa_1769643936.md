@@ -1,7 +1,7 @@
 ---
 type: whatsapp
 source: Unknown
-received: 2026-01-29T00:42:46.493358
+received: 2026-01-28T23:45:36.215935
 status: pending
 priority: normal
 ---
@@ -21,3 +21,8 @@ Full Data: {
 - [ ] Analyze content
 - [ ] Draft reply
 - [ ] Log to Odoo
+
+
+# Execution Result
+Failed: No module named 'agents.odoo_agent'
+Completed: 2026-01-30T19:31:09.207112

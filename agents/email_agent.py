@@ -26,12 +26,12 @@ class EmailAgent:
         """Authenticate with Gmail"""
         return self.gmail_skill.authenticate()
     
-    def check_emails(self) -> List[Dict[str, Any]]:
+    def check_emails(self, mark_read: bool = False) -> List[Dict[str, Any]]:
         """Check for new relevant emails"""
         logger.info("Email Agent: Checking for new emails...")
         
         # Use Gmail skill to fetch and filter
-        relevant_emails = self.gmail_skill.check_emails()
+        relevant_emails = self.gmail_skill.check_emails(mark_read=mark_read)
         
         self.last_check_time = datetime.now()
         logger.info(f"Email Agent: Found {len(relevant_emails)} relevant emails")

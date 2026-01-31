@@ -66,13 +66,33 @@ class LinkedInSkill:
             
             if not await self._wait_for_login(page):
                 logger.info("LinkedIn Skill: Session invalid. Attempting autonomous login...")
+
                 try:
                     # Navigate to login if not there
                     if "login" not in page.url and "checkpoint" not in page.url:
                         await page.goto("https://www.linkedin.com/login", wait_until="domcontentloaded")
+                        await page.wait_for_timeout(2000)
+
+                    # Try multiple selectors for username
+                    user_selectors = ['#username', 'input[name="session_key"]', '.login-email']
+                    user_filled = False
+                    for sel in user_selectors:
+                        if await page.locator(sel).count() > 0:
+                            await page.fill(sel, Config.LINKEDIN_EMAIL)
+                            user_filled = True
+                            break
                     
-                    await page.fill('#username', Config.LINKEDIN_EMAIL)
-                    await page.fill('#password', Config.LINKEDIN_PASSWORD)
+                    if not user_filled:
+                         raise Exception("Could not find username field")
+
+                    # Try multiple selectors for password
+                    pass_selectors = ['#password', 'input[name="session_password"]', '.login-password']
+                    for sel in pass_selectors:
+                        if await page.locator(sel).count() > 0:
+                            await page.fill(sel, Config.LINKEDIN_PASSWORD)
+                            break
+                            
+                    # Click submit (robustly)
                     await page.click('button[type="submit"]')
                     
                     # Wait for feed
@@ -80,10 +100,16 @@ class LinkedInSkill:
                     logger.info("LinkedIn Skill: Autonomous login successful!")
                     
                 except Exception as e:
-                    logger.error(f"LinkedIn Skill: Autonomous login failed: {e}")
+                    logger.error(f"LinkedIn Skill: Autonomous login failed. Current URL: {page.url} - Error: {e}")
+                    # Capture screenshot for debugging
+                    try:
+                         await page.screenshot(path="linkedin_login_fail.png")
+                         logger.info("Saved screenshot to linkedin_login_fail.png")
+                    except: pass
+                    
                     await context.close()
                     await playwright.stop()
-                    return {"success": False, "error": "Login failed (Manual refresh required)"}
+                    return {"success": False, "error": f"Login failed: {e}"}
 
             # 2. Get Notifications
             logger.info("LinkedIn Skill: Checking notifications...")
@@ -204,65 +230,63 @@ class LinkedInSkill:
             logger.info("LinkedIn Skill: Checking login...")
             if "linkedin.com/feed" not in page.url:
                 await page.goto("https://www.linkedin.com/feed/", wait_until="domcontentloaded")
-            
-            if not await self._wait_for_login(page):
-                logger.info("LinkedIn Skill: Session invalid. Attempting autonomous login...")
+                await page.wait_for_timeout(3000)
+
+            # Double check if we are really logged in
+            if await page.locator('#global-nav').count() == 0:
+                logger.info("LinkedIn Skill: Not logged in (no global-nav). Attempting login...")
                 try:
-                    if "login" not in page.url and "checkpoint" not in page.url:
+                    if "login" not in page.url:
                         await page.goto("https://www.linkedin.com/login", wait_until="domcontentloaded")
                     
                     await page.fill('#username', Config.LINKEDIN_EMAIL)
                     await page.fill('#password', Config.LINKEDIN_PASSWORD)
                     await page.click('button[type="submit"]')
                     await page.wait_for_selector('#global-nav', timeout=30000)
-                    logger.info("LinkedIn Skill: Autonomous login successful!")
                 except Exception as e:
-                    logger.error(f"LinkedIn Skill: Autonomous login failed during post: {e}")
-                    await context.close()
-                    await playwright.stop()
-                    return {"success": False, "error": "Login failed"}
+                     logger.error(f"Login failed: {e}")
+                     return {"success": False, "error": "Login failed"}
 
             # 2. Click Start a Post
             logger.info("LinkedIn Skill: Clicking 'Start a post'...")
-            start_post_selectors = [
-                'button.share-box-feed-entry__trigger',
-                'button[aria-label="Start a post"]',
-                'div.share-box-feed-entry__top-bar button' 
-            ]
-            
-            clicked = False
-            for sel in start_post_selectors:
-                if await page.locator(sel).count() > 0:
-                    await page.locator(sel).first.click()
-                    clicked = True
-                    break
-            
-            if not clicked:
-                try:
-                    await page.get_by_text("Start a post").click()
-                    clicked = True
-                except: pass
-                
-            if not clicked:
-                return {"success": False, "error": "Could not find 'Start a post' button"}
+            # Try finding the button by text first as it's most reliable across UI versions
+            try:
+                await page.get_by_text("Start a post").first.click(timeout=5000)
+            except:
+                # Fallback to selectors
+                selectors = ['button.share-box-feed-entry__trigger', 'button[aria-label="Start a post"]']
+                clicked = False
+                for sel in selectors:
+                    if await page.locator(sel).count() > 0:
+                        await page.locator(sel).first.click()
+                        clicked = True
+                        break
+                if not clicked:
+                     return {"success": False, "error": "Could not find 'Start a post' button"}
 
             # 3. Type Content
             logger.info("LinkedIn Skill: Typing content...")
-            await page.wait_for_selector('.share-creation-state__text-editor .ql-editor', timeout=10000)
-            editor = page.locator('.share-creation-state__text-editor .ql-editor').first
-            await editor.click()
-            await editor.fill(content)
-            await page.wait_for_timeout(1000)
+            # Wait for modal
+            await page.wait_for_selector('.share-creation-state__text-editor', timeout=10000)
+            
+            # Focus and type
+            await page.click('.share-creation-state__text-editor .ql-editor')
+            await page.keyboard.type(content)
+            await page.wait_for_timeout(2000)
 
             # 4. Click Post
             logger.info("LinkedIn Skill: Clicking 'Post'...")
-            post_btn = page.locator('button.share-actions__primary-action')
-            if await post_btn.count() == 0:
-                # Fallback selector
-                post_btn = page.get_by_text("Post", exact=True).nth(-1)
+            # The button usually has class share-actions__primary-action
+            # And text "Post"
             
-            await post_btn.click()
-            await page.wait_for_timeout(3000)
+            post_btn = page.locator('button.share-actions__primary-action')
+            if await post_btn.count() > 0 and await post_btn.is_enabled():
+                await post_btn.click()
+            else:
+                # Try getting by text
+                await page.get_by_text("Post", exact=True).click()
+            
+            await page.wait_for_timeout(5000) # Wait for post to process
             
             await context.close()
             await playwright.stop()

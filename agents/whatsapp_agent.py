@@ -12,7 +12,14 @@ class WhatsAppAgent:
     """Agent for WhatsApp communication"""
     
     def __init__(self):
-        self.skill = WhatsAppSkill(enabled=Config.WHATSAPP_ENABLED, headless=True)
+        import os
+        from pathlib import Path
+        session_path = os.path.abspath("./whatsapp_session")
+        self.skill = WhatsAppSkill(
+            enabled=Config.WHATSAPP_ENABLED, 
+            headless=False, # Must match Watcher config to share session
+            session_dir=session_path
+        )
         
     def send_alert(self, message: str) -> Dict[str, Any]:
         """Send an alert to the admin"""

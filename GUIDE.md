@@ -1,278 +1,117 @@
-# Panaversity Student Assistant - Comprehensive Developer Guide 📘
+# 🧭 Panaversity AI Employee - Developer Guide
 
-Welcome to the **Panaversity Student Assistant** development guide. This document provides everything you need to run, maintain, and extend the system.
+Welcome to the **Panaversity Student Assistant** development guide. This document provides a clear roadmap for running, maintaining, and scaling your digital FTE.
 
+---
 
-## ⚡ 1. Quick Start Commands (Top Priority)
+## ⚡ 1. Running the System
 
-### 🎯 Easiest Way - Double Click Batch Files
-1. **Start Everything**: Double-click `start.bat` in the root folder
-2. **Stop Everything**: Double-click `stop.bat` in the root folder
+### 🚀 **Automatic Mode (Recommended)**
+The easiest way to start the full autonomous system (Back, Front, Brain, Watchers) in separate windows.
 
-That's it! The batch files will:
-- Start Backend API on port 8000
-- Start Frontend UI on port 3000
-- Open in separate windows so you can see the logs
+**📂 Double-Click Method:**
+- Run **`start.bat`** (or `python start_autonomous.py`) to start everything.
+- Run **`stop.bat`** (or `python stop_autonomous.py`) to kill all processes.
 
-### 📝 Simple Terminal Commands (If you prefer typing)
-
-**Option 1 - Two separate terminals:**
+**💻 Terminal Method:**
 ```powershell
-# Terminal 1: Start Backend
-cd d:\Panavers\Projects\hackathon_panaverse
-python src/api/chat_api.py
+# Start everything via Python orchestrator
+python start_autonomous.py
 
-# Terminal 2: Start Frontend
-cd d:\Panavers\Projects\hackathon_panaverse
-cd frontend; npm run dev
-
+# Force stop everything
+python stop_autonomous.py
 ```
 
-**Option 2 - Stop everything:**
-```powershell
-taskkill /F /IM python.exe
-taskkill /F /IM node.exe
-```
+### 🛠 **Manual / Individual Launch (Debugging)**
+Use these commands to run specific components if you need to see real-time logs in your active terminal.
 
-### 🔧 Advanced - Run Individual Components
-```powershell
-# Backend API only
-python src/api/chat_api.py
-# check status running
-http://localhost:8000/api/status
+| Component | Command | Description |
+| :--- | :--- | :--- |
+| **Backend API** | `python src/api/chat_api.py` | FastAPI server on port 8000 |
+| **Frontend UI** | `cd frontend && npm run dev` | Next.js 15 on port 3000 |
+http://localhost:3000/dashboard (Admin Login) ODOO="http://localhost:8069"
+| **Watchers** | `python watchers.py` | Starts the "Senses" (Gmail/WA monitoring) |
+| **Brain Agent** | `python agents/brain_agent.py` | Starts the "Reasoning" (Task processing) |
+| **WhatsApp Auth** | `python tests/verify_whatsapp.py` | Scan QR code for the first time |
+| **Odoo Sync** | `python mcp/odoo_server.py` | Manual test for Odoo bridge |
 
-# Troubleshooting
-# Kill the old backend
-taskkill /F /IM python.exe
+---
 
-# Wait 2 seconds
-timeout /t 2
+## 🏗️ 2. System Architecture
+The AI Employee follows a **Local-First, Watcher-Brain-Vault** architecture.
 
-# ReStart new backend
-python src/api/chat_api.py
+### 🔄 The "Digital FTE" Loop
+1. **Watchers (Senses)**: Monitor Gmail and WhatsApp. When a "Panaverse" keyword or lead is found, they write a `.md` file to `data/vault/Needs_Action/`.
+2. **Vault (Memory)**: A folder-based persistent system.
+    - `/Needs_Action`: The inbox for the AI.
+    - `/Plans`: AI-generated execution steps.
+    - `/Done`: Completed task history.
+3. **Brain (Reasoning)**: The `brain_agent.py` runs the "Ralph Wiggum Persistence Loop". It picks up tasks from the Vault, creates a plan, executes it using MCP tools (Odoo/Gmail), and moves the file to `/Done`.
 
-# Frontend only
-cd frontend
-npm run dev
+### 📂 Directory Map
+- `agents/`: Orchestration logic (Brain, Chat, Email).
+- `skills/`: Core capabilities (Gmail, WhatsApp, Odoo, Search).
+- `mcp/`: Server-side bridges for external tools.
+- `frontend//app/dashboard/`: The modern Sales Command Center.
+- `data/vault/`: Local markdown memory.
 
-# Watchers (monitors Gmail/WhatsApp)
-python watchers.py
+---
 
-# Brain Agent (processes tasks)
-python brain_agent.py
+## 🔑 3. Configuration (.env)
+Your `.env` file must be in the root directory. Key requirements:
 
-# WhatsApp - First Time Setup (Scan QR Code)
-python tests/verify_whatsapp.py
+```ini
+# Core AI
+GOOGLE_API_KEY="AIzaSy..."  # Default: Gemini 2.5 Flash
 
-# WhatsApp - Send Test Message
-python tests/test_wa_send.py
+# Odoo CRM
+ODOO_URL="http://localhost:8069"
+ODOO_DB="panaverse_crm"
+ODOO_USER="admin***"
+ODOO_PASS="password***"
+
+# Gmail
+GMAIL_CREDENTIALS_PATH="credentials.json"
+GMAIL_TOKEN_PATH="token.json"
+
+# WhatsApp
+WHATSAPP_ENABLED=true
+ADMIN_WHATSAPP="+923244279017" # Notification target
+
+# Admin Login
+ADMIN_EMAIL="kh*********@mail.com"
+ADMIN_PASS="A********@123"
 ```
 
 ---
 
-## 🏗️ 2. System Architecture (The Platinum Tier)
+## 🛠️ 4. Troubleshooting
 
-The system is built on the **Watcher → Vault → Brain** architecture, designed for 24/7 autonomous operations.
-
-### 🔄 The Data Flow
-1. **WATCHERS**: `watchers.py` monitors Gmail, WhatsApp, and LinkedIn. When a relevant update (Quiz, Assignment, Deadline) is found, it creates a `.md` file in `data/vault/Needs_Action/`.
-2. **VAULT**: A folder-based persistent memory system.
-   - `Needs_Action/`: Input queue for the AI.
-   - `Plans/`: AI-generated step-by-step execution plans.
-   - `Done/`: Historical archive of completed tasks.
-3. **BRAIN**: `brain_agent.py` processes the vault using the `MainAgent`. It picks a task, uses specialized **Skills** to execute it, and moves the task to `Done`.
-
-### 📂 Directory Structure
-```text
-├── data/vault/             # Persistent Task Memory (Markdown)
-├── frontend/               # Next.js 15 App (Modern Glassmorphism UI)
-├── logs/                   # System and activity logs
-├── scripts/                # Utility and database seeding scripts
-├── skills/                 # Modular AI Capabilities
-│   ├── chatbot_skill/      # Gemini 2.5 Flash / Gemini 3.0 Fallback
-│   ├── gmail_monitoring/   # OAuth2 Gmail Scanner
-│   ├── odoo_skill/         # CRM & Lead Management integration
-│   ├── whatsapp_skill/     # Playwright-based browser automation
-│   ├── linkedin_skill/     # Pulse/Notice monitoring
-│   └── web_search_skill/   # DuckDuckGo integration
-├── src/
-│   ├── agents/             # Logic for Main, Chat, and Sub-Agents
-│   ├── api/                # FastAPI Endpoints & WebSockets
-│   └── utils/              # Config, Logger, and Shared Helpers
-├── tests/                  # Verification and unit tests
-├── start.all               # Full System Launcher
-├── stop.all                # Graceful System Stopper
-├── watchers.py             # Background sensors (Emails/Socials)
-└── brain_agent.py          # The core task execution engine
-```
-
----
-
-## 🛠️ 3. Troubleshooting & Fixes
-
-### Port Conflicts
-If you see `[WinError 10013]` or `Port already in use`:
+### ❌ Port 8000/3000 in Use
+If the system fails to start due to port conflicts:
 ```powershell
-# Kill processes using the ports
-taskkill /F /IM python.exe
-taskkill /F /IM node.exe
-# Or find specific PID
-netstat -ano | findstr :8000
+# Kill all Python/Node processes hanging in background
+taskkill /F /IM python.exe /T
+taskkill /F /IM node.exe /T
 ```
 
-### AI Rate Limits (429 Errors)
-The system  - We have migrated to `gemini-2.5-flash` as the primary model.
-  - **Default**: `gemini-2.5-flash`
-  - **Fallback**: `gemini-3.0-flash`u hit limits:
-- Wait 60 seconds (Free tier usually resets per minute).
-- Check `skills/chatbot_skill/skill.py` to ensure your model names match the latest available in your region.
+### ❌ WhatsApp Not Ready
+If WhatsApp fails to send:
+1. Delete the `whatsapp_session/` folder.
+2. Run `python tests/verify_whatsapp.py`.
+3. Scan the QR code precisely.
 
-### Environment & Dependencies
-```powershell
-# Refresh dependencies
-pip install -r requirements.txt --upgrade
-playwright install chromium
-
-# Reset WhatsApp login
-Remove-Item -Recurse -Force whatsapp_session
-```
-
-### WhatsApp Setup & Troubleshooting
-
-#### Initial Setup
-1. **Enable WhatsApp** in `.env`:
-   ```bash
-   WHATSAPP_ENABLED=true
-   ADMIN_WHATSAPP=+923244279017  # Your number with country code
-   ```
-
-2. **Install Playwright Browser**:
-   ```powershell
-   playwright install chromium
-   ```
-
-3. **First Login** (QR Code Scan):
-   ```powershell
-   # Run this to open WhatsApp Web and scan QR code
-   python tests/verify_whatsapp.py
-   ```
-   - Browser will open to WhatsApp Web
-   - Scan QR code with your phone
-   - Session saves to `./whatsapp_session` folder
-   - You only need to do this ONCE
-
-4. **Test Sending**:
-   ```powershell
-   # Send a test message
-   python tests/test_wa_send.py
-   ```
-
-#### Common WhatsApp Issues
-
-**Issue 1: "NotImplementedError" or Event Loop Errors**
-- **Cause**: Windows event loop conflicts
-- **Fix**: Already handled in skill.py v2.1
-- **Verify**: Check you're using the latest skill version
-
-**Issue 2: "Login timeout" or QR Code Not Scanning**
-- **Cause**: Session expired or browser automation blocked
-- **Fix**:
-  ```powershell
-  # Delete session and re-scan
-  Remove-Item -Recurse -Force whatsapp_session
-  python tests/verify_whatsapp.py
-  ```
-
-**Issue 3: "WhatsApp integration is disabled"**
-- **Cause**: `WHATSAPP_ENABLED=false` in .env
-- **Fix**: Set `WHATSAPP_ENABLED=true` in `.env` file
-
-**Issue 4: Messages Not Sending**
-- **Cause**: Invalid phone number format
-- **Fix**: Use format `+923001234567` (country code + number, no spaces)
-
-**Issue 5: Watcher Not Finding Messages**
-- **Cause**: Keywords don't match or archived chats
-- **Fix**: 
-  - Check `FILTER_KEYWORDS` in `.env`
-  - Watcher checks both main and archived chats
-  - Verify messages contain your keywords
-
-### 📱 WhatsApp Integration - FIXED & READY
-WhatsApp has been completely overhauled and is now **100% functional**. See:
-- **Quick Start**: [`WHATSAPP_QUICKSTART.md`](WHATSAPP_QUICKSTART.md) - 3-step setup
-- **Complete Fix**: [`WHATSAPP_FIX_SUMMARY.md`](WHATSAPP_FIX_SUMMARY.md) - All changes
-- **Technical Deep Dive**: [`WHATSAPP_DEEP_DIVE_ANALYSIS.md`](WHATSAPP_DEEP_DIVE_ANALYSIS.md) - Root cause analysis
-
----
-#### WhatsApp Architecture
-
-```
-┌─────────────────────────────────────────────┐
-│  Entry Points (Choose One)                  │
-├─────────────────────────────────────────────┤
-│  1. Direct Skill:                           │
-│     from skills.whatsapp_skill.skill import │
-│     skill = WhatsAppSkill()                 │
-│                                             │
-│  2. MCP Server (Recommended):               │
-│     whatsapp_server.call_tool()             │
-│                                             │
-│  3. Agent Wrapper:                          │
-│     whatsapp_agent.send_alert()             │
-│                                             │
-│  4. Watcher (Automatic):                    │
-│     Polls every 60 minutes                  │
-└─────────────────────────────────────────────┘
-         ↓
-┌─────────────────────────────────────────────┐
-│  WhatsAppSkill (Core Implementation)        │
-│  - Playwright browser automation            │
-│  - Session persistence                      │
-│  - Windows event loop handling              │
-│  - Send & check messages                    │
-└─────────────────────────────────────────────┘
-```
-
-#### Testing WhatsApp Integration
-
-```powershell
-# Test 1: Verify login session
-python tests/verify_whatsapp.py
-
-# Test 2: Send a message
-python tests/test_wa_send.py
-
-# Test 3: Check for messages
-python tests/test_whatsapp.py
-
-# Test 4: Full skill test suite
-python tests/test_skills.py
-```
-
----
-
-## 🚀 4. Adding New Features
-
-### How to Add a New Skill
-1. Create a folder in `skills/your_skill_name/`.
-2. Implement a class that performs the specific task.
-3. Add the skill to `src/agents/main_agent.py` so the Brain can use it.
-
-### How to Add a New Watcher
-1. Open `watchers.py`.
-2. Add a new async function that polls your source (e.g., a new CRM or API).
-3. Ensure it writes a formatted `.md` file to `data/vault/Needs_Action/`.
+### ❌ Odoo Connection Failure
+Verify Odoo is running locally or your Docker instance is up. Check `xmlrpc.client` is working in Python.
 
 ---
 
 ## 🧪 5. Testing & Verification
-Always run tests before pushing changes:
+Before updates, run the comprehensive verification suite:
 ```powershell
-# Run the Comprehensive Skill Test
-python test_skills.py
+python tests/verify_system.py
 ```
-This verifies your API keys, Odoo authentication, and model responses in one go.
+This verifies **Read**, **Write**, and **Filter** capabilities for all major agents.
 
 ---
-*Guide maintained by Antigravity AI - Last updated Jan 27, 2026*
+*Maintained by Team AI Force - Platinum Tier Hackathon Project (2026)*

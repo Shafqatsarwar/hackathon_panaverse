@@ -55,6 +55,20 @@ class OdooMCPServer:
                         }
                     }
                 }
+            },
+            {
+                "name": "search_leads",
+                "description": "Search for leads by keyword",
+                "inputSchema": {
+                    "type": "object",
+                    "properties": {
+                        "keyword": {
+                            "type": "string",
+                            "description": "Keyword to search in lead names"
+                        }
+                    },
+                    "required": ["keyword"]
+                }
             }
         ]
     
@@ -73,6 +87,15 @@ class OdooMCPServer:
         elif name == "get_recent_leads":
             leads = self.skill.get_leads(limit=arguments.get("limit", 5))
             return {"success": True, "leads": leads}
+
+        elif name == "search_leads":
+            # Assuming get_leads supports a domain or filter, otherwise we fetch and filter in python
+            # For simplicity, let's fetch more and filter here if the skill doesn't support search yet
+            # Ideally update skill to support search.
+            all_leads = self.skill.get_leads(limit=50) 
+            keyword = arguments.get("keyword", "").lower()
+            filtered = [l for l in all_leads if keyword in str(l.get('name', '')).lower()]
+            return {"success": True, "leads": filtered, "count": len(filtered)}
             
         else:
             return {"error": f"Unknown tool: {name}"}
