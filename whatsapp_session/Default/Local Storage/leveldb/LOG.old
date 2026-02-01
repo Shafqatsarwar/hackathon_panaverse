@@ -1,3 +1,14 @@
-2026/02/01-00:03:09.978 fc8 Reusing MANIFEST D:\Panavers\Projects\hackathon_panaverse\whatsapp_session\Default\Local Storage\leveldb/MANIFEST-000001
-2026/02/01-00:03:09.996 fc8 Recovering log #17
-2026/02/01-00:03:10.006 fc8 Reusing old log D:\Panavers\Projects\hackathon_panaverse\whatsapp_session\Default\Local Storage\leveldb/000017.log 
+2026/02/01-00:35:29.640 f10 Reusing MANIFEST D:\Panavers\Projects\hackathon_panaverse\whatsapp_session\Default\Local Storage\leveldb/MANIFEST-000001
+2026/02/01-00:35:29.652 f10 Recovering log #22
+2026/02/01-00:35:29.652 f10 Level-0 table #24: started
+2026/02/01-00:35:29.675 f10 Level-0 table #24: 15158 bytes OK
+2026/02/01-00:35:29.692 f10 Delete type=0 #22
+2026/02/01-00:35:29.693 56c4 Compacting 4@0 + 1@1 files
+2026/02/01-00:35:29.723 56c4 Generated table #26@0: 80 keys, 7758 bytes
+2026/02/01-00:35:29.723 56c4 Compacted 4@0 + 1@1 files => 7758 bytes
+2026/02/01-00:35:29.724 56c4 compacted to: files[ 0 1 0 0 0 0 0 ]
+2026/02/01-00:35:29.726 56c4 Delete type=2 #14
+2026/02/01-00:35:29.726 56c4 Delete type=2 #16
+2026/02/01-00:35:29.726 56c4 Delete type=2 #19
+2026/02/01-00:35:29.726 56c4 Delete type=2 #22
+2026/02/01-00:35:29.727 56c4 Delete type=2 #24

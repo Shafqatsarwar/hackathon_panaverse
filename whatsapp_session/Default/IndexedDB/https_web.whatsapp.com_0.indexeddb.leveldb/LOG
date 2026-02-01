@@ -1,27 +1,90 @@
-2026/02/01-00:04:55.943 4cc0 Reusing MANIFEST D:\Panavers\Projects\hackathon_panaverse\whatsapp_session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
-2026/02/01-00:04:55.944 4cc0 Recovering log #517
-2026/02/01-00:04:56.115 4cc0 Reusing old log D:\Panavers\Projects\hackathon_panaverse\whatsapp_session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/000517.log 
-2026/02/01-00:04:58.192 4cc0 Level-0 table #529: started
-2026/02/01-00:04:58.242 4cc0 Level-0 table #529: 1083245 bytes OK
-2026/02/01-00:04:58.244 4cc0 Delete type=0 #517
-2026/02/01-00:04:58.246 4cc0 Manual compaction at level-0 from '\x00P\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00Q\x00\x00\x00' @ 0 : 0; will stop at (end)
-2026/02/01-00:04:58.323 2ff8 Compacting 1@1 + 8@2 files
-2026/02/01-00:04:58.489 2ff8 Generated table #530@1: 74983 keys, 2258236 bytes
-2026/02/01-00:04:58.607 2ff8 Generated table #531@1: 37156 keys, 2196728 bytes
-2026/02/01-00:04:58.695 2ff8 Generated table #532@1: 25125 keys, 2191236 bytes
-2026/02/01-00:04:58.756 2ff8 Generated table #533@1: 7790 keys, 2127658 bytes
-2026/02/01-00:04:58.873 2ff8 Generated table #534@1: 53361 keys, 2185580 bytes
-2026/02/01-00:04:59.077 2ff8 Generated table #535@1: 113670 keys, 2267186 bytes
-2026/02/01-00:04:59.217 2ff8 Generated table #536@1: 113823 keys, 2265595 bytes
-2026/02/01-00:04:59.323 2ff8 Generated table #537@1: 89760 keys, 1796410 bytes
-2026/02/01-00:04:59.323 2ff8 Compacted 1@1 + 8@2 files => 17288629 bytes
-2026/02/01-00:04:59.324 2ff8 compacted to: files[ 0 0 8 0 0 0 0 ]
-2026/02/01-00:04:59.324 2ff8 Delete type=2 #519
-2026/02/01-00:04:59.325 2ff8 Delete type=2 #520
-2026/02/01-00:04:59.325 2ff8 Delete type=2 #521
-2026/02/01-00:04:59.325 2ff8 Delete type=2 #522
-2026/02/01-00:04:59.325 2ff8 Delete type=2 #523
-2026/02/01-00:04:59.325 2ff8 Delete type=2 #524
-2026/02/01-00:04:59.325 2ff8 Delete type=2 #525
-2026/02/01-00:04:59.325 2ff8 Delete type=2 #526
-2026/02/01-00:04:59.325 2ff8 Delete type=2 #529
+2026/02/01-00:37:06.008 3a54 Reusing MANIFEST D:\Panavers\Projects\hackathon_panaverse\whatsapp_session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
+2026/02/01-00:37:06.009 3a54 Recovering log #1015
+2026/02/01-00:37:06.041 3a54 Reusing old log D:\Panavers\Projects\hackathon_panaverse\whatsapp_session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/001015.log 
+2026/02/01-00:37:08.262 5590 Level-0 table #1035: started
+2026/02/01-00:37:08.308 5590 Level-0 table #1035: 245270 bytes OK
+2026/02/01-00:37:08.309 5590 Delete type=0 #1015
+2026/02/01-00:37:08.310 3a54 Manual compaction at level-0 from '\x00b\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00c\x00\x00\x00' @ 0 : 0; will stop at '\x00b\x00\x00\x05' @ 3598186 : 1
+2026/02/01-00:37:08.315 3a54 Compacting 1@0 + 0@1 files
+2026/02/01-00:37:08.360 3a54 Generated table #1036@0: 7056 keys, 123485 bytes
+2026/02/01-00:37:08.374 3a54 Generated table #1037@0: 1266 keys, 25875 bytes
+2026/02/01-00:37:08.374 3a54 Compacted 1@0 + 0@1 files => 149360 bytes
+2026/02/01-00:37:08.375 3a54 compacted to: files[ 0 2 14 0 0 0 0 ]
+2026/02/01-00:37:08.376 3a54 Delete type=2 #1035
+2026/02/01-00:37:08.376 3a54 Manual compaction at level-0 from '\x00b\x00\x00\x05' @ 3598186 : 1 .. '\x00c\x00\x00\x00' @ 0 : 0; will stop at (end)
+2026/02/01-00:37:08.454 1da8 Compacting 1@1 + 10@2 files
+2026/02/01-00:37:08.897 1da8 Generated table #1038@1: 89626 keys, 2239633 bytes
+2026/02/01-00:37:09.243 1da8 Generated table #1039@1: 22579 keys, 2236245 bytes
+2026/02/01-00:37:09.426 1da8 Generated table #1040@1: 32041 keys, 2235404 bytes
+2026/02/01-00:37:09.525 1da8 Generated table #1041@1: 25072 keys, 2191250 bytes
+2026/02/01-00:37:09.623 1da8 Generated table #1042@1: 17085 keys, 2147862 bytes
+2026/02/01-00:37:09.674 1da8 Generated table #1043@1: 4320 keys, 2123864 bytes
+2026/02/01-00:37:09.754 1da8 Generated table #1044@1: 36736 keys, 2164925 bytes
+2026/02/01-00:37:09.987 1da8 Generated table #1045@1: 109397 keys, 2259714 bytes
+2026/02/01-00:37:10.170 1da8 Generated table #1046@1: 109096 keys, 2260430 bytes
+2026/02/01-00:37:10.307 1da8 Generated table #1047@1: 109601 keys, 2262524 bytes
+2026/02/01-00:37:10.324 1da8 Generated table #1048@1: 4060 keys, 82917 bytes
+2026/02/01-00:37:10.324 1da8 Compacted 1@1 + 10@2 files => 22204768 bytes
+2026/02/01-00:37:10.325 1da8 compacted to: files[ 0 1 15 0 0 0 0 ]
+2026/02/01-00:37:10.325 1da8 Delete type=2 #1019
+2026/02/01-00:37:10.325 1da8 Delete type=2 #1020
+2026/02/01-00:37:10.325 1da8 Delete type=2 #1021
+2026/02/01-00:37:10.325 1da8 Delete type=2 #1022
+2026/02/01-00:37:10.326 1da8 Delete type=2 #1023
+2026/02/01-00:37:10.326 1da8 Delete type=2 #1024
+2026/02/01-00:37:10.326 1da8 Delete type=2 #1025
+2026/02/01-00:37:10.326 1da8 Delete type=2 #1026
+2026/02/01-00:37:10.326 1da8 Delete type=2 #1027
+2026/02/01-00:37:10.326 1da8 Delete type=2 #1028
+2026/02/01-00:37:10.326 1da8 Delete type=2 #1036
+2026/02/01-00:37:18.835 1da8 Compacting 1@1 + 4@2 files
+2026/02/01-00:37:19.572 1da8 Generated table #1049@1: 109593 keys, 2261602 bytes
+2026/02/01-00:37:19.964 1da8 Generated table #1050@1: 109425 keys, 2261317 bytes
+2026/02/01-00:37:20.072 1da8 Generated table #1051@1: 23990 keys, 498465 bytes
+2026/02/01-00:37:20.072 1da8 Compacted 1@1 + 4@2 files => 5021384 bytes
+2026/02/01-00:37:20.074 1da8 compacted to: files[ 0 0 14 0 0 0 0 ]
+2026/02/01-00:37:28.391 3a54 Level-0 table #1053: started
+2026/02/01-00:37:28.487 3a54 Level-0 table #1053: 1123723 bytes OK
+2026/02/01-00:37:28.491 3a54 Delete type=2 #1029
+2026/02/01-00:37:28.492 3a54 Delete type=2 #1030
+2026/02/01-00:37:28.492 3a54 Delete type=2 #1031
+2026/02/01-00:37:28.492 3a54 Delete type=2 #1032
+2026/02/01-00:37:28.492 3a54 Delete type=0 #1034
+2026/02/01-00:37:28.492 3a54 Delete type=2 #1037
+2026/02/01-00:37:28.503 3a54 Compacting 1@0 + 0@1 files
+2026/02/01-00:37:28.645 3a54 Generated table #1054@0: 33479 keys, 734233 bytes
+2026/02/01-00:37:28.657 3a54 Generated table #1055@0: 3315 keys, 66291 bytes
+2026/02/01-00:37:28.658 3a54 Compacted 1@0 + 0@1 files => 800524 bytes
+2026/02/01-00:37:28.658 3a54 compacted to: files[ 0 2 14 0 0 0 0 ]
+2026/02/01-00:37:28.659 3a54 Delete type=2 #1053
+2026/02/01-00:37:28.668 3a54 Compacting 1@1 + 10@2 files
+2026/02/01-00:37:28.960 3a54 Generated table #1056@1: 86612 keys, 2237245 bytes
+2026/02/01-00:37:29.203 3a54 Generated table #1057@1: 33689 keys, 2240829 bytes
+2026/02/01-00:37:29.484 3a54 Generated table #1058@1: 26405 keys, 2241045 bytes
+2026/02/01-00:37:29.731 3a54 Generated table #1059@1: 31781 keys, 2192716 bytes
+2026/02/01-00:37:29.928 3a54 Generated table #1060@1: 20988 keys, 2164117 bytes
+2026/02/01-00:37:30.015 3a54 Generated table #1061@1: 4195 keys, 2124916 bytes
+2026/02/01-00:37:30.147 3a54 Generated table #1062@1: 14117 keys, 2134589 bytes
+2026/02/01-00:37:31.911 3a54 Generated table #1063@1: 111086 keys, 2262395 bytes
+2026/02/01-00:37:32.074 3a54 Generated table #1064@1: 109082 keys, 2260236 bytes
+2026/02/01-00:37:32.228 3a54 Generated table #1065@1: 109309 keys, 2261044 bytes
+2026/02/01-00:37:32.261 3a54 Generated table #1066@1: 26832 keys, 555973 bytes
+2026/02/01-00:37:32.261 3a54 Compacted 1@1 + 10@2 files => 22675105 bytes
+2026/02/01-00:37:32.262 3a54 compacted to: files[ 0 1 15 0 0 0 0 ]
+2026/02/01-00:37:32.262 3a54 Delete type=2 #1054
+2026/02/01-00:37:32.905 1da8 Compacting 1@1 + 4@2 files
+2026/02/01-00:37:33.299 1da8 Generated table #1067@1: 109426 keys, 2260629 bytes
+2026/02/01-00:37:33.619 1da8 Generated table #1068@1: 109133 keys, 2261796 bytes
+2026/02/01-00:37:33.693 1da8 Generated table #1069@1: 31821 keys, 659039 bytes
+2026/02/01-00:37:33.694 1da8 Compacted 1@1 + 4@2 files => 5181464 bytes
+2026/02/01-00:37:33.695 1da8 compacted to: files[ 0 0 14 0 0 0 0 ]
+2026/02/01-00:37:33.696 1da8 Delete type=2 #1038
+2026/02/01-00:37:33.696 1da8 Delete type=2 #1039
+2026/02/01-00:37:33.696 1da8 Delete type=2 #1040
+2026/02/01-00:37:33.696 1da8 Delete type=2 #1041
+2026/02/01-00:37:33.696 1da8 Delete type=2 #1042
+2026/02/01-00:37:33.697 1da8 Delete type=2 #1043
+2026/02/01-00:37:33.697 1da8 Delete type=2 #1044
+2026/02/01-00:37:33.697 1da8 Delete type=2 #1045
+2026/02/01-00:37:33.699 1da8 Delete type=2 #1046
+2026/02/01-00:37:33.699 1da8 Delete type=2 #1047

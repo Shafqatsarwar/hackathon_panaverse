@@ -259,24 +259,63 @@ class LinkedInSkill:
             
             # 1. Login Check (with auto-login fallback)
             logger.info("LinkedIn Skill: Checking login...")
+            await page.wait_for_timeout(2000)
+            
             if "linkedin.com/feed" not in page.url:
                 await page.goto("https://www.linkedin.com/feed/", wait_until="domcontentloaded")
-                await page.wait_for_timeout(3000)
+            
+            is_logged_in = await self._wait_for_login(page)
+            
+            if not is_logged_in:
+                if "feed" in page.url:
+                    logger.warning("LinkedIn Skill: Global nav not found but URL indicates feed. Proceeding.")
+                else:
+                    logger.info("LinkedIn Skill: Session Check Failed. Attempting to handle...")
+                    try:
+                         # Same manual intervention logic as scrape_leads
+                         if "login" not in page.url and "checkpoint" not in page.url and "signup" not in page.url:
+                            await page.goto("https://www.linkedin.com/login", wait_until="domcontentloaded")
+                            await page.wait_for_timeout(1000)
 
-            # Double check if we are really logged in
-            if await page.locator('#global-nav').count() == 0:
-                logger.info("LinkedIn Skill: Not logged in (no global-nav). Attempting login...")
-                try:
-                    if "login" not in page.url:
-                        await page.goto("https://www.linkedin.com/login", wait_until="domcontentloaded")
-                    
-                    await page.fill('#username', Config.LINKEDIN_EMAIL)
-                    await page.fill('#password', Config.LINKEDIN_PASSWORD)
-                    await page.click('button[type="submit"]')
-                    await page.wait_for_selector('#global-nav', timeout=30000)
-                except Exception as e:
-                     logger.error(f"Login failed: {e}")
-                     return {"success": False, "error": "Login failed"}
+                         # Wait for login fields
+                         try:
+                            user_selectors = ['#username', 'input[name="session_key"]', '.login-email']
+                            await page.wait_for_selector(','.join(user_selectors), timeout=10000)
+                            
+                            # Auto-fill if possible (but we mainly rely on manual if stuck)
+                            for sel in user_selectors:
+                                if await page.locator(sel).count() > 0:
+                                    await page.fill(sel, Config.LINKEDIN_EMAIL)
+                                    break
+                            
+                            pass_selectors = ['#password', 'input[name="session_password"]', '.login-password']
+                            for sel in pass_selectors:
+                                if await page.locator(sel).count() > 0:
+                                    await page.fill(sel, Config.LINKEDIN_PASSWORD)
+                                    break
+                            
+                            await page.click('button[type="submit"]')
+                            
+                            logger.info("LinkedIn Skill: Submitted login. Waiting for Feed...")
+                            await page.wait_for_selector('#global-nav, .scaffold-layout__nav', timeout=60000)
+                            
+                         except Exception as inner_e:
+                            logger.error(f"LinkedIn Skill: Auto-login failed: {inner_e}. Pausing for manual intervention...")
+                            if not self.headless:
+                                # Give user 69s to fix it
+                                await page.wait_for_timeout(69000)
+                                if "feed" in page.url:
+                                     logger.info("LinkedIn Skill: User seemingly fixed login manually.")
+                                else:
+                                     raise inner_e
+                            else:
+                                raise inner_e
+                                
+                    except Exception as e:
+                         logger.error(f"Login failed: {e}")
+                         await context.close()
+                         await playwright.stop()
+                         return {"success": False, "error": "Login failed"}
 
             # 2. Click Start a Post
             logger.info("LinkedIn Skill: Clicking 'Start a post'...")
