@@ -40,12 +40,22 @@ class WhatsAppSkill:
         """
         logger.info("WhatsApp Skill: Waiting for login (QR Scan might be needed)...")
         
-        # Combined selector: Check for Chat List OR Pane Side OR New Chat Button
+        # Combined selector: Check for Chat List OR Pane Side OR New Chat Button OR Search Box
         # This matches verify_whatsapp.py logic which was successful
-        login_selector = '#pane-side, [data-testid="chat-list"], div[aria-label="Chat list"], canvas'
+        login_selector = '#pane-side, [data-testid="chat-list"], div[aria-label="Chat list"], canvas, [data-testid="chat-list-search"], [data-icon="chat"]'
         
         try:
             logger.info(f"WhatsApp Skill: Checking login with robust selector...")
+            
+            # Check for "Loading your chats" screen (often causes hangs)
+            try:
+                loading_msg = page.get_by_text("Loading your chats")
+                if await loading_msg.count() > 0:
+                     logger.info("WhatsApp Skill: 'Loading your chats' screen detected. Waiting for it to finish...")
+                     await loading_msg.wait_for(state="detached", timeout=60000)
+            except Exception:
+                pass
+            
             # Wait up to 60s
             await page.wait_for_selector(login_selector, timeout=60000, state='visible')
             logger.info("WhatsApp Skill: Login detected successfully!")
@@ -272,6 +282,16 @@ class WhatsAppSkill:
             
             # Helper to parse visible chats
             async def parse_chats():
+                # Give it more time to load all chats, especially for large histories
+                logger.info("WhatsApp Skill: Waiting for chat rows to load...")
+                try:
+                    await page.wait_for_selector('div[role="row"]', timeout=30000)
+                except:
+                    logger.warning("WhatsApp Skill: Timeout waiting for chat rows. List might be empty or DOM changed.")
+                
+                # Extra buffer for rendering
+                await page.wait_for_timeout(5000) 
+                
                 rows = await page.locator('div[role="row"]').all()
                 results = []
                 for row in rows[:limit]:
@@ -317,7 +337,20 @@ class WhatsAppSkill:
                         continue  # Skip buggy row
                 return results
 
-            # 1. Check Archived (PRIORITY)
+            # 1. Scroll ID 'pane-side' to trigger lazy loading
+            logger.info("WhatsApp Skill: Scrolling chat list to load messages...")
+            try:
+                # Find the scrollable pane
+                pane = page.locator('#pane-side')
+                if await pane.count() > 0:
+                     # Scroll down a few times
+                     for _ in range(3):
+                        await pane.evaluate("element => element.scrollTop += 500")
+                        await page.wait_for_timeout(1000)
+            except Exception as e:
+                logger.warning(f"WhatsApp Skill: Scroll failed: {e}")
+
+            # 2. Check Archived (PRIORITY)
             if check_archived:
                 logger.info("WhatsApp Skill: Checking Archived folder (PRIORITY)...")
                 try:

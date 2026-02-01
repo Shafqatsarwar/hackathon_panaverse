@@ -3,6 +3,9 @@ cd /d "%~dp0"
 title Panaversity Autonomous System
 color 0a
 
+:: Force UTF-8 for Python to avoid UnicodeEncodeErrors on Windows
+set PYTHONUTF8=1
+
 echo ========================================================
 echo   Panaversity AI Employee - Autonomous Mode
 echo ========================================================

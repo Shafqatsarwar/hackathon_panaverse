@@ -244,7 +244,9 @@ Be helpful, concise, and professional. Use emojis sparingly to make responses fr
             
             summary = "Latest LinkedIn Notifications:\n"
             for n in notifs:
-                summary += f"- {str(n)[:100]}\n"
+                # Sanitize text for Windows console safety
+                safe_text = str(n).encode('utf-8', 'replace').decode('utf-8')
+                summary += f"- {safe_text[:100]}\n"
             return summary
         except Exception as e:
             logger.error(f"LinkedIn tool error: {e}")

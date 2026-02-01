@@ -1,23 +1,27 @@
-2026/01/31-00:56:17.002 5790 Reusing MANIFEST D:\Panavers\Projects\hackathon_panaverse\whatsapp_session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
-2026/01/31-00:56:17.011 5790 Recovering log #3837
-2026/01/31-00:56:17.075 5790 Reusing old log D:\Panavers\Projects\hackathon_panaverse\whatsapp_session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/003837.log 
-2026/01/31-00:56:18.777 4f40 Level-0 table #3847: started
-2026/01/31-00:56:18.799 4f40 Level-0 table #3847: 574442 bytes OK
-2026/01/31-00:56:18.800 4f40 Delete type=0 #3837
-2026/01/31-00:56:18.800 4f40 Manual compaction at level-0 from ' \x7f\x03\x00\x00\x00' @ 72057594037927935 : 1 .. ' \x80\x03\x00\x00\x00' @ 0 : 0; will stop at (end)
-2026/01/31-00:56:18.879 5790 Compacting 1@1 + 6@2 files
-2026/01/31-00:56:19.008 5790 Generated table #3848@1: 83319 keys, 2231660 bytes
-2026/01/31-00:56:19.090 5790 Generated table #3849@1: 34670 keys, 2220379 bytes
-2026/01/31-00:56:19.170 5790 Generated table #3850@1: 27933 keys, 2189286 bytes
-2026/01/31-00:56:19.231 5790 Generated table #3851@1: 19301 keys, 2156907 bytes
-2026/01/31-00:56:19.389 5790 Generated table #3852@1: 117119 keys, 2271364 bytes
-2026/01/31-00:56:19.457 5790 Generated table #3853@1: 46963 keys, 908669 bytes
-2026/01/31-00:56:19.457 5790 Compacted 1@1 + 6@2 files => 11978265 bytes
-2026/01/31-00:56:19.457 5790 compacted to: files[ 0 0 6 0 0 0 0 ]
-2026/01/31-00:56:19.458 5790 Delete type=2 #3839
-2026/01/31-00:56:19.458 5790 Delete type=2 #3840
-2026/01/31-00:56:19.458 5790 Delete type=2 #3841
-2026/01/31-00:56:19.458 5790 Delete type=2 #3842
-2026/01/31-00:56:19.458 5790 Delete type=2 #3843
-2026/01/31-00:56:19.459 5790 Delete type=2 #3844
-2026/01/31-00:56:19.459 5790 Delete type=2 #3847
+2026/02/01-00:03:19.776 1c94 Reusing MANIFEST D:\Panavers\Projects\hackathon_panaverse\whatsapp_session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
+2026/02/01-00:03:19.777 1c94 Recovering log #506
+2026/02/01-00:03:19.928 1c94 Reusing old log D:\Panavers\Projects\hackathon_panaverse\whatsapp_session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/000506.log 
+2026/02/01-00:03:21.761 4b8c Level-0 table #518: started
+2026/02/01-00:03:21.822 4b8c Level-0 table #518: 1056412 bytes OK
+2026/02/01-00:03:21.823 4b8c Delete type=0 #506
+2026/02/01-00:03:21.825 4b8c Manual compaction at level-0 from '\x00O\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00P\x00\x00\x00' @ 0 : 0; will stop at (end)
+2026/02/01-00:03:21.930 6b8 Compacting 1@1 + 8@2 files
+2026/02/01-00:03:22.106 6b8 Generated table #519@1: 74061 keys, 2257652 bytes
+2026/02/01-00:03:22.224 6b8 Generated table #520@1: 37538 keys, 2197992 bytes
+2026/02/01-00:03:22.321 6b8 Generated table #521@1: 24961 keys, 2189799 bytes
+2026/02/01-00:03:22.388 6b8 Generated table #522@1: 7462 keys, 2129732 bytes
+2026/02/01-00:03:22.511 6b8 Generated table #523@1: 59420 keys, 2193078 bytes
+2026/02/01-00:03:22.714 6b8 Generated table #524@1: 113952 keys, 2268222 bytes
+2026/02/01-00:03:22.856 6b8 Generated table #525@1: 114116 keys, 2267876 bytes
+2026/02/01-00:03:22.943 6b8 Generated table #526@1: 72377 keys, 1443621 bytes
+2026/02/01-00:03:22.943 6b8 Compacted 1@1 + 8@2 files => 16947972 bytes
+2026/02/01-00:03:22.944 6b8 compacted to: files[ 0 0 8 0 0 0 0 ]
+2026/02/01-00:03:22.945 6b8 Delete type=2 #508
+2026/02/01-00:03:22.946 6b8 Delete type=2 #509
+2026/02/01-00:03:22.946 6b8 Delete type=2 #510
+2026/02/01-00:03:22.946 6b8 Delete type=2 #511
+2026/02/01-00:03:22.947 6b8 Delete type=2 #512
+2026/02/01-00:03:22.947 6b8 Delete type=2 #513
+2026/02/01-00:03:22.948 6b8 Delete type=2 #514
+2026/02/01-00:03:22.948 6b8 Delete type=2 #515
+2026/02/01-00:03:22.948 6b8 Delete type=2 #518

@@ -27,7 +27,7 @@ Use these commands to run specific components if you need to see real-time logs 
 
 | Component | Command | Description |
 | :--- | :--- | :--- |
-| **Backend API** | `python src/api/chat_api.py` | FastAPI server on port 8000 |
+| **Backend API** | `python src/api/chat_api.py` | FastAPI server on port 8000 | Backend Status: http://localhost:8000/api/status
 | **Frontend UI** | `cd frontend && npm run dev` | Next.js 15 on port 3000 |
 http://localhost:3000/dashboard (Admin Login) ODOO="http://localhost:8069"
 | **Watchers** | `python watchers.py` | Starts the "Senses" (Gmail/WA monitoring) |

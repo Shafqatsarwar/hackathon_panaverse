@@ -16,10 +16,15 @@ export default function Home() {
   // Fetch System Status
   useEffect(() => {
     const fetchStatus = async () => {
+      // Ensure client-side only
+      if (typeof window === 'undefined') return;
+      
       try {
         const res = await fetch("http://localhost:8000/api/status");
-        const data = await res.json();
-        setStatus(data);
+        if (res.ok) {
+           const data = await res.json();
+           setStatus(data);
+        }
       } catch (e) {
         console.error("Failed to fetch status", e);
       }

@@ -152,7 +152,13 @@ async def chat(message: ChatMessage, request: Request):
         )
         
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        import traceback
+        logger.error(f"API Error in /api/chat: {e}\n{traceback.format_exc()}")
+        return ChatResponse(
+            response=f"I encountered an internal error. Please check the server logs. Details: {str(e)}",
+            timestamp=datetime.now().isoformat(),
+            status="error"
+        )
 
 
 @app.websocket("/ws/chat")

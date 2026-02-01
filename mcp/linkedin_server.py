@@ -2,6 +2,7 @@
 LinkedIn MCP Server for Panaversity Student Assistant
 Provides LinkedIn tools via Model Context Protocol
 """
+from skills.linkedin_skill.skill import LinkedInSkill
 import logging
 from typing import Any, Dict, List
 from src.utils.config import Config
@@ -14,6 +15,7 @@ class LinkedInMCPServer:
     def __init__(self):
         self.name = "linkedin"
         self.version = "1.0.0"
+        self.skill = LinkedInSkill(enabled=Config.LINKEDIN_ENABLED, headless=True)
         
     def list_tools(self) -> List[Dict[str, Any]]:
         """List available LinkedIn tools"""
@@ -27,11 +29,6 @@ class LinkedInMCPServer:
                         "content": {
                             "type": "string",
                             "description": "Text content of the post"
-                        },
-                        "visibility": {
-                            "type": "string",
-                            "enum": ["PUBLIC", "CONNECTIONS"],
-                            "default": "PUBLIC"
                         }
                     },
                     "required": ["content"]
@@ -63,25 +60,19 @@ class LinkedInMCPServer:
             
     def _post_update(self, content: str) -> Dict[str, Any]:
         """Post update logic"""
-        if not Config.LINKEDIN_ENABLED:
-            return {"success": False, "error": "LinkedIn integration is disabled in .env"}
+        if not self.skill.enabled:
+            return {"success": False, "error": "LinkedIn integration is disabled"}
             
         logger.info(f"Posting to LinkedIn: {content[:50]}...")
-        # Placeholder for API call
-        return {"success": True, "id": "mock_linkedin_share_123"}
+        return self.skill.post_update(content)
         
     def _check_notifications(self, limit: int) -> Dict[str, Any]:
         """Check notifications logic"""
-        if not Config.LINKEDIN_ENABLED:
-            return {"success": False, "error": "LinkedIn integration is disabled in .env"}
+        if not self.skill.enabled:
+            return {"success": False, "error": "LinkedIn integration is disabled"}
             
-        return {
-            "success": True,
-            "notifications": [
-                {"id": 1, "text": "New job alert: Python Developer"},
-                {"id": 2, "text": "Ali viewed your profile"}
-            ]
-        }
+        # LinkedInSkill.check_notifications returns the scraping result
+        return self.skill.check_notifications()
 
 if __name__ == "__main__":
     server = LinkedInMCPServer()

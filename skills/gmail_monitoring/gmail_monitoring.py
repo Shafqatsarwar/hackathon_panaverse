@@ -35,21 +35,37 @@ class GmailMonitoringSkill:
             creds = None
             
             if os.path.exists(self.token_path):
-                with open(self.token_path, 'rb') as token:
-                    creds = pickle.load(token)
+                try:
+                    with open(self.token_path, 'rb') as token:
+                        creds = pickle.load(token)
+                except Exception as e:
+                    logger.warning(f"Failed to load token: {e}")
+                    creds = None
             
-            if not creds or not creds.valid:
-                if creds and creds.expired and creds.refresh_token:
-                    creds.refresh(Request())
+            # If creds exist but are invalid, try to refresh
+            if creds and not creds.valid:
+                if creds.expired and creds.refresh_token:
+                    try:
+                        creds.refresh(Request())
+                    except Exception as e:
+                        logger.warning(f"Token refresh failed: {e}. Re-authenticating...")
+                        creds = None
                 else:
-                    if not os.path.exists(self.credentials_path):
-                        logger.error(f"Credentials file not found: {self.credentials_path}")
-                        return False
-                    
-                    flow = InstalledAppFlow.from_client_secrets_file(
-                        self.credentials_path, SCOPES)
-                    creds = flow.run_local_server(port=0)
+                    creds = None
+
+            # If no valid creds (either didn't exist, load failed, or refresh failed)
+            if not creds:
+                if not os.path.exists(self.credentials_path):
+                    logger.error(f"Credentials file not found: {self.credentials_path}")
+                    return False
                 
+                # Run local server for initial auth
+                print("Initiating Gmail Authentication... Check your browser.")
+                flow = InstalledAppFlow.from_client_secrets_file(
+                    self.credentials_path, SCOPES)
+                creds = flow.run_local_server(port=0)
+                
+                # Save the new credentials
                 with open(self.token_path, 'wb') as token:
                     pickle.dump(creds, token)
             
