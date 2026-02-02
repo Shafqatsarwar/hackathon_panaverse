@@ -33,6 +33,7 @@ env/
 
 # Gmail API credentials and tokens
 credentials.json
+credentials.json.json
 token.json
 token.pickle
 
