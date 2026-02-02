@@ -42,22 +42,22 @@ class TestResults:
     
     def print_summary(self):
         print("\n" + "=" * 80)
-        print("📊 TEST RESULTS SUMMARY")
+        print("TEST RESULTS SUMMARY")
         print("=" * 80)
         
         for skill_name, tests in self.results.items():
-            print(f"\n🔧 {skill_name}")
+            print(f"\nSKILL: {skill_name}")
             print("-" * 80)
             for test in tests:
-                status = "✅ PASS" if test["passed"] else "❌ FAIL"
+                status = "PASS" if test["passed"] else "FAIL"
                 print(f"  {status} - {test['test']}")
                 if test["message"]:
                     print(f"         {test['message']}")
         
         print("\n" + "=" * 80)
         print(f"Total Tests: {self.total_tests}")
-        print(f"Passed: {self.passed_tests} ✅")
-        print(f"Failed: {self.failed_tests} ❌")
+        print(f"Passed: {self.passed_tests}")
+        print(f"Failed: {self.failed_tests}")
         print(f"Success Rate: {(self.passed_tests/self.total_tests*100):.1f}%")
         print("=" * 80)
 
@@ -78,51 +78,51 @@ try:
     gmail_skill = GmailMonitoringSkill(
         credentials_path=Config.GMAIL_CREDENTIALS_PATH,
         token_path=Config.GMAIL_TOKEN_PATH,
-        keywords=Config.FILTER_KEYWORDS.split(',')
+        keywords=Config.FILTER_KEYWORDS
     )
     
     # Test 1: Authentication
-    print("\n📧 Test 1: Gmail Authentication")
+    print("\nTest 1: Gmail Authentication")
     try:
         auth_result = gmail_skill.authenticate()
         if auth_result and gmail_skill.service:
             results.add_result("Gmail", "Authentication", True, "Successfully authenticated")
-            print("✅ PASS - Gmail authenticated")
+            print("PASS - Gmail authenticated")
         else:
             results.add_result("Gmail", "Authentication", False, "Authentication failed")
-            print("❌ FAIL - Authentication failed")
+            print("FAIL - Authentication failed")
     except Exception as e:
         results.add_result("Gmail", "Authentication", False, str(e))
-        print(f"❌ FAIL - {e}")
+        print(f"FAIL - {e}")
     
     # Test 2: Fetch Unread Emails
-    print("\n📧 Test 2: Fetch Unread Emails")
+    print("\nTest 2: Fetch Unread Emails")
     try:
         emails = gmail_skill.fetch_unread_emails(max_results=5)
         if isinstance(emails, list):
             results.add_result("Gmail", "Fetch Emails", True, f"Found {len(emails)} emails")
-            print(f"✅ PASS - Fetched {len(emails)} unread emails")
+            print(f"PASS - Fetched {len(emails)} unread emails")
         else:
             results.add_result("Gmail", "Fetch Emails", False, "Invalid response type")
-            print("❌ FAIL - Invalid response")
+            print("FAIL - Invalid response")
     except Exception as e:
         results.add_result("Gmail", "Fetch Emails", False, str(e))
-        print(f"❌ FAIL - {e}")
+        print(f"FAIL - {e}")
     
     # Test 3: Filter Emails by Keywords
-    print("\n📧 Test 3: Filter Emails by Keywords")
+    print("\nTest 3: Filter Emails by Keywords")
     try:
         all_emails = gmail_skill.fetch_unread_emails(max_results=10)
         filtered = gmail_skill.filter_relevant_emails(all_emails)
         if isinstance(filtered, list):
             results.add_result("Gmail", "Filter Emails", True, f"Filtered to {len(filtered)} relevant emails")
-            print(f"✅ PASS - Filtered {len(all_emails)} → {len(filtered)} relevant emails")
+            print(f"PASS - Filtered {len(all_emails)} -> {len(filtered)} relevant emails")
         else:
             results.add_result("Gmail", "Filter Emails", False, "Invalid response")
-            print("❌ FAIL - Invalid response")
+            print("FAIL - Invalid response")
     except Exception as e:
         results.add_result("Gmail", "Filter Emails", False, str(e))
-        print(f"❌ FAIL - {e}")
+        print(f"FAIL - {e}")
 
 except Exception as e:
     results.add_result("Gmail", "Initialization", False, str(e))
@@ -147,59 +147,59 @@ try:
         wa_skill = WhatsAppSkill(enabled=True, headless=True)
         
         # Test 1: Check Messages
-        print("\n💬 Test 1: Check for Messages")
+        print("\nTest 1: Check for Messages")
         try:
             messages = wa_skill.check_messages()
             if isinstance(messages, dict) and "success" in messages:
                 results.add_result("WhatsApp", "Check Messages", messages["success"], 
                                  messages.get("error", f"Found {len(messages.get('messages', []))} messages"))
                 if messages["success"]:
-                    print(f"✅ PASS - Found {len(messages.get('messages', []))} messages")
+                    print(f"PASS - Found {len(messages.get('messages', []))} messages")
                 else:
-                    print(f"❌ FAIL - {messages.get('error')}")
+                    print(f"FAIL - {messages.get('error')}")
             else:
                 results.add_result("WhatsApp", "Check Messages", False, "Invalid response format")
-                print("❌ FAIL - Invalid response format")
+                print("FAIL - Invalid response format")
         except Exception as e:
             results.add_result("WhatsApp", "Check Messages", False, str(e))
-            print(f"❌ FAIL - {e}")
+            print(f"FAIL - {e}")
         
         # Test 2: Check Archived Messages
-        print("\n💬 Test 2: Check Archived Messages")
+        print("\nTest 2: Check Archived Messages")
         try:
             archived = wa_skill.check_archived_messages()
             if isinstance(archived, dict) and "success" in archived:
                 results.add_result("WhatsApp", "Check Archived", archived["success"],
                                  archived.get("error", f"Found {len(archived.get('messages', []))} archived"))
                 if archived["success"]:
-                    print(f"✅ PASS - Found {len(archived.get('messages', []))} archived messages")
+                    print(f"PASS - Found {len(archived.get('messages', []))} archived messages")
                 else:
-                    print(f"❌ FAIL - {archived.get('error')}")
+                    print(f"FAIL - {archived.get('error')}")
             else:
                 results.add_result("WhatsApp", "Check Archived", False, "Invalid response format")
-                print("❌ FAIL - Invalid response format")
+                print("FAIL - Invalid response format")
         except Exception as e:
             results.add_result("WhatsApp", "Check Archived", False, str(e))
-            print(f"❌ FAIL - {e}")
+            print(f"FAIL - {e}")
         
         # Test 3: Send Message (to admin)
-        print("\n💬 Test 3: Send Test Message")
+        print("\nTest 3: Send Test Message")
         try:
-            test_msg = f"🤖 Test message from Panaversity Assistant - {datetime.now().strftime('%H:%M:%S')}"
+            test_msg = f"Test message from Panaversity Assistant - {datetime.now().strftime('%H:%M:%S')}"
             send_result = wa_skill.send_message(Config.ADMIN_WHATSAPP, test_msg)
             if isinstance(send_result, dict) and "success" in send_result:
                 results.add_result("WhatsApp", "Send Message", send_result["success"],
                                  send_result.get("error", "Message sent"))
                 if send_result["success"]:
-                    print(f"✅ PASS - Message sent to {Config.ADMIN_WHATSAPP}")
+                    print(f"PASS - Message sent to {Config.ADMIN_WHATSAPP}")
                 else:
-                    print(f"❌ FAIL - {send_result.get('error')}")
+                    print(f"FAIL - {send_result.get('error')}")
             else:
                 results.add_result("WhatsApp", "Send Message", False, "Invalid response format")
-                print("❌ FAIL - Invalid response format")
+                print("FAIL - Invalid response format")
         except Exception as e:
             results.add_result("WhatsApp", "Send Message", False, str(e))
-            print(f"❌ FAIL - {e}")
+            print(f"FAIL - {e}")
 
 except Exception as e:
     results.add_result("WhatsApp", "Initialization", False, str(e))

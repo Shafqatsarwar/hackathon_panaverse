@@ -272,6 +272,37 @@ async def log_to_chat_history(entry: Dict):
         print(f"Error logging to chat history: {e}")
 
 
+@app.post("/api/report/summary")
+async def trigger_summary_report():
+    """Trigger the summary reporting task manually"""
+    try:
+        logger.info("API: Manual Trigger for Summary Report")
+        
+        # We run the script as a subprocess to keep it isolated/clean
+        # OR we could import the function. Subprocess is safer for full re-check.
+        import subprocess
+        
+        # Determine script path
+        script_path = project_root / "scripts" / "send_summary.py"
+        
+        # Run in background so request returns fast? Or wait?
+        # User wants to know if it sent. Let's wait (it takes 1-2 mins).
+        # Actually, let's run it async and return "Started".
+        
+        process = await asyncio.create_subprocess_exec(
+            sys.executable, str(script_path),
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE
+        )
+        
+        # We won't wait for full completion here to keep UI responsive, 
+        # but in a real app better to have task queue.
+        return {"status": "Summary Report Initiated! Check your Email/WhatsApp in 2 minutes."}
+
+    except Exception as e:
+        logger.error(f"Failed to trigger summary: {e}")
+        return {"status": f"Error: {str(e)}"}
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)

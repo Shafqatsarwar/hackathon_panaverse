@@ -18,6 +18,7 @@ class Config:
     
     # Admin Notifications
     ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "khansarwar1@hotmail.com")
+    ADMIN_PASS = os.getenv("ADMIN_PASS", "Admin@123")
     ADMIN_WHATSAPP = os.getenv("ADMIN_WHATSAPP", "+923244279017")
     
     # SMTP Configuration

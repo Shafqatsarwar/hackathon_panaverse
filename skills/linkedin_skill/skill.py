@@ -372,3 +372,10 @@ class LinkedInSkill:
         """Post an update (Sync wrapper)"""
         if not self.enabled: return {"success": False, "error": "LinkedIn integration is disabled"}
         return self._run_async_safe(self._post_update_async(content))
+
+if __name__ == "__main__":
+    # Test execution
+    print("Testing LinkedIn Skill...")
+    skill = LinkedInSkill(headless=False, enabled=True)
+    res = skill.scrape_leads()
+    print(f"Result: {res}")

@@ -10,8 +10,28 @@ Welcome to the **Panaversity Student Assistant** development guide. This documen
 The easiest way to start the full autonomous system (Back, Front, Brain, Watchers) in separate windows.
 
 **📂 Double-Click Method:**
-- Run **`start.bat`** (or `python start_autonomous.py`) to start everything.
+- Run **`start.bat`** (or `python start_autonomous.py `) to start everything.
 - Run **`stop.bat`** (or `python stop_autonomous.py`) to kill all processes.
+
+**⚠️ Emergency Kill (If stuck):**
+Run this in terminal to force-kill everything:
+```cmd
+taskkill /F /IM python.exe /T & taskkill /F /IM node.exe /T
+```
+
+**☁️ Oracle Cloud Deployment:**
+To zip and deploy the latest code to your server:
+
+**Option 1: Using Batch Script (Windows)**
+```powershell
+.\deploy_oracle.bat
+```
+*Note: If you see an error like "term is not recognized", ensure you include `.\` before the filename.*
+
+**Option 2: Using Python Directly**
+```bash
+python oracle/prepare_deploy.py
+```
 
 **💻 Terminal Method:**
 ```powershell
@@ -34,6 +54,8 @@ http://localhost:3000/dashboard (Admin Login) ODOO="http://localhost:8069"
 | **Brain Agent** | `python agents/brain_agent.py` | Starts the "Reasoning" (Task processing) |
 | **WhatsApp Auth** | `python tests/verify_whatsapp.py` | Scan QR code for the first time |
 | **Odoo Sync** | `python mcp/odoo_server.py` | Manual test for Odoo bridge |
+| **LinkedIn Test** | `python -m skills.linkedin_skill.skill` | Test LinkedIn Scraper |
+
 
 ---
 
@@ -61,7 +83,7 @@ The AI Employee follows a **Local-First, Watcher-Brain-Vault** architecture.
 Your `.env` file must be in the root directory. Key requirements:
 
 ```ini
-# Core AI
+# Core AIpyt
 GOOGLE_API_KEY="AIzaSy..."  # Default: Gemini 2.5 Flash
 
 # Odoo CRM

@@ -60,7 +60,21 @@ export function Sidebar() {
                 {quickActions.map((action) => (
                     <button
                         key={action.name}
-                        onClick={() => alert(`Quick Action: ${action.name} (Coming Soon)`)}
+                        onClick={async () => {
+                            if (action.action === 'email' || action.action === 'whatsapp') {
+                                try {
+                                    const channel = action.action === 'email' ? 'Email' : 'WhatsApp';
+                                    alert(`Sending Summary Report via ${channel}... Please wait.`);
+                                    const response = await fetch('http://localhost:8000/api/report/summary', { method: 'POST' });
+                                    const data = await response.json();
+                                    alert(data.status || "Command Sent!");
+                                } catch (e) {
+                                    alert("Error contacting backend: " + e);
+                                }
+                            } else {
+                                alert(`Quick Action: ${action.name} (Coming Soon)`);
+                            }
+                        }}
                         className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/10 transition-all text-gray-300 text-sm hover:scale-105 active:scale-95"
                     >
                         <span className="text-lg">{action.icon}</span>
@@ -71,6 +85,7 @@ export function Sidebar() {
 
             <div className="mt-4">
                 <button
+                    onClick={() => window.location.reload()}
                     className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-red-500/10 to-pink-500/10 border border-red-500/20 hover:border-red-500/40 text-red-300 text-sm transition-all"
                 >
                     <span>🔄</span> Refresh Dashboard

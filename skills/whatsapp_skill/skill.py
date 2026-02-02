@@ -14,6 +14,31 @@ from playwright.async_api import async_playwright, Page, BrowserContext, Playwri
 # Configure Logging
 logger = logging.getLogger(__name__)
 
+class FileLock:
+    """Simple file lock to prevent multiple playwright instances on same dir"""
+    def __init__(self, lock_file: str):
+        self.lock_file = lock_file
+        
+    def acquire(self, timeout: int = 60) -> bool:
+        start_time = time.time()
+        while time.time() - start_time < timeout:
+            if not os.path.exists(self.lock_file):
+                try:
+                    with open(self.lock_file, 'w') as f:
+                        f.write(str(os.getpid()))
+                    return True
+                except:
+                    pass
+            time.sleep(1)
+        return False
+
+    def release(self):
+        try:
+            if os.path.exists(self.lock_file):
+                os.remove(self.lock_file)
+        except:
+            pass
+
 class WhatsAppSkill:
     """
     Skill to handle WhatsApp interactions using Playwright.
@@ -31,7 +56,7 @@ class WhatsAppSkill:
         
         # Playwright instances (managed per operation)
         self._playwright: Optional[Playwright] = None
-        self._context: Optional[BrowserContext] = None
+        self._lock = FileLock(os.path.join(self.session_dir, "whatsapp.lock"))
 
     async def _wait_for_login(self, page: Page) -> bool:
         """
@@ -71,6 +96,11 @@ class WhatsAppSkill:
 
     async def _init_browser(self) -> Optional[Page]:
         """Initialize browser and return page, or None if failed"""
+        # Try to acquire lock first
+        if not self._lock.acquire(timeout=60): # Wait up to 60s for other process to finish
+            logger.warning("WhatsApp Skill: Could not acquire lock. Another process is using WhatsApp.")
+            return None
+
         try:
             self._playwright = await async_playwright().start()
             
@@ -83,8 +113,8 @@ class WhatsAppSkill:
                     "--disable-setuid-sandbox",
                     "--disable-infobars",
                     "--window-size=1280,800"
-                ]
-                # user_agent removed to match verify_whatsapp.py default
+                ],
+                user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
             )
             
             page = self._context.pages[0] if self._context.pages else await self._context.new_page()
@@ -116,6 +146,7 @@ class WhatsAppSkill:
         finally:
             self._context = None
             self._playwright = None
+            self._lock.release()
 
     async def send_message_async(self, number: str, message: str) -> Dict[str, Any]:
         """

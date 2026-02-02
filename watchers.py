@@ -62,19 +62,36 @@ class WatcherSystem:
     def run(self):
         logger.info("Starting Watcher System...")
         time.sleep(2) # Give user time to read logs
+        
+        last_email_check = 0
+        last_whatsapp_check = 0
+        last_odoo_check = 0
+        
         while True:
             try:
-                self.check_email()
-                if self.whatsapp_enabled:
-                     self.check_whatsapp()
+                current_time = time.time()
                 
-                # Check Odoo (Sync tasks/leads)
-                self.check_odoo()
-                # self.check_filesystem() # Future
+                # Check Email Interval (convert minutes to seconds)
+                if (current_time - last_email_check) >= (self.config.EMAIL_CHECK_INTERVAL * 60):
+                    self.check_email()
+                    last_email_check = time.time()
+                
+                # Check WhatsApp Interval
+                if self.whatsapp_enabled:
+                    if (current_time - last_whatsapp_check) >= (self.config.WHATSAPP_CHECK_INTERVAL * 60):
+                        self.check_whatsapp()
+                        last_whatsapp_check = time.time()
+                
+                # Check Odoo (Every 15 mins default or same as email)
+                if (current_time - last_odoo_check) >= (15 * 60):
+                    self.check_odoo()
+                    last_odoo_check = time.time()
+                
             except Exception as e:
                 logger.error(f"Watcher Loop Error: {e}")
             
-            time.sleep(60) # Check every minute
+            # Sleep for 1 minute before next iteration check
+            time.sleep(60)
 
     def check_email(self):
         if not self.email_ready:
